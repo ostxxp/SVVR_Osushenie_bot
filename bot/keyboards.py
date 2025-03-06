@@ -8,13 +8,15 @@ edit_list = InlineKeyboardMarkup(
                      [InlineKeyboardButton(text="Настройки администраторов", callback_data="admin_settings")]]
 )
 
-back_to_menu = InlineKeyboardMarkup(
-    inline_keyboard=[[InlineKeyboardButton(text="Вернуться в меню", callback_data="back_to_menu")]],
+back_to_objects = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text="<-- Вернуться к объектам", callback_data="back_to_objects")]],
 )
 
 def objects_to_keyboard(id):
     buttons = []
-    for obj in of.fetch_objects(id):
-        buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
-    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
-    return keyboard
+    if of.fetch_objects(id) is not None:
+        for obj in of.fetch_objects(id):
+            buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
+        keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+        return keyboard
+    return None

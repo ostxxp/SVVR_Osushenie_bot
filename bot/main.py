@@ -1,13 +1,15 @@
 import asyncio
 
 import start, handlers
+import inline_calendar
 from __init__ import dp, bot
 
 
 async def main():
     dp.include_routers(
         start.router,
-        handlers.router
+        handlers.router,
+        inline_calendar.router
     )
     await dp.start_polling(bot)
 
