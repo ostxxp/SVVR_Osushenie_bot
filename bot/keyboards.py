@@ -1,5 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+import DB.objects_fetching as of
 
 edit_list = InlineKeyboardMarkup(
     inline_keyboard=[[InlineKeyboardButton(text="Добавить прораба", callback_data="add_prorab"),
@@ -11,8 +12,9 @@ back_to_menu = InlineKeyboardMarkup(
     inline_keyboard=[[InlineKeyboardButton(text="Вернуться в меню", callback_data="back_to_menu")]],
 )
 
-
-
-button1 = InlineKeyboardButton(text="Кнопка 1", callback_data="button1")
-keyboard = InlineKeyboardMarkup(inline_keyboard=[[button1]])
-keyboard.add(button1)
+def objects_to_keyboard(id):
+    buttons = []
+    for obj in of.fetch_objects(id):
+        buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard

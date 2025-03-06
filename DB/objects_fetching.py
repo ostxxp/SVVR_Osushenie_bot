@@ -1,4 +1,5 @@
-from docs_fetching import client
+from DB.docs_fetching import client
+from DB.prorabs_fetching import prorabs
 
 spreadsheet = client.open_by_key('1b2IQ7uB_bh2h0kkpfYfU7AWbOBo8cc6umBHwQW7462M')
 worksheet = spreadsheet.sheet1
@@ -13,11 +14,18 @@ for d in data_temp:
     data.append(list(filter(lambda x: any(x), d))[:3])
 
 def fetch_objects(id):
-    name =
+    for prorab in prorabs:
+        if int(prorab[0]) == id:
+            name = prorab[1]
+            break
+    else:
+        return None
+    objects = []
     for d in data:
         try:
-            if d[2] = :
-                print(d[1])
+            if d[2] == name:
+                objects.append(d[1])
         except:
             pass
+    return objects
 

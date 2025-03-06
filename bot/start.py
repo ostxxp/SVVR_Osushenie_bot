@@ -9,10 +9,15 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from __init__ import bot
 
+import keyboards
 
 router = Router()
 
 
 @router.message(CommandStart())
 async def start(message: Message):
-    await message.answer("Здравствуй!")
+    keyboard = keyboards.objects_to_keyboard(message.from_user.id)
+    if keyboard is not None:
+        await message.answer("Здравствуй! Выбери объект:", reply_markup=keyboard)
+    else:
+        await message.answer("Похоже, что вы не прораб, либо вам не назначен ни один объект")
