@@ -1,7 +1,6 @@
 from aiogram import Router
 
-from aiogram import F
-from aiogram.filters import callback_data, Command
+from aiogram.filters import Command
 from aiogram.types import Message
 import DB.database as db
 
