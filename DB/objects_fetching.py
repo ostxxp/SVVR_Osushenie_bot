@@ -13,6 +13,7 @@ data = []
 for d in data_temp:
     data.append(list(filter(lambda x: any(x), d))[:3])
 
+
 def fetch_objects(id):
     for prorab in prorabs:
         if int(prorab[0]) == id:

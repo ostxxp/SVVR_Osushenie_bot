@@ -3,8 +3,11 @@ from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
+import reminder
 
 from states import States
+
+import asyncio
 
 import keyboards
 
