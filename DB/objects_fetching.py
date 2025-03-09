@@ -5,6 +5,7 @@ spreadsheet = client.open_by_key('1b2IQ7uB_bh2h0kkpfYfU7AWbOBo8cc6umBHwQW7462M')
 worksheet = spreadsheet.sheet1
 all_values = worksheet.get_all_values()
 
+
 headers = all_values[3]
 data_temp = all_values[4:]
 

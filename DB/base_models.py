@@ -3,7 +3,11 @@ from sqlalchemy.orm import relationship, Session
 
 from DB.database import Base, engine
 
-class Admin(Base):
-    __tablename__ = 'admins'
+class Prorab(Base):
+    __tablename__ = 'prorabs'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    is_filled = Column(Integer)
+
+class Installer(Base):
+    __tablename__ = 'installers'
+    id = Column(Integer, primary_key=True)
