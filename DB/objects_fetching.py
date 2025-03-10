@@ -1,7 +1,7 @@
 from DB.docs_fetching import client
 from DB.prorabs_fetching import prorabs
 
-spreadsheet = client.open_by_key('1b2IQ7uB_bh2h0kkpfYfU7AWbOBo8cc6umBHwQW7462M')
+spreadsheet = client.open_by_key('1z6pOvc5rZc0bjE-Zy5GsyX0t4Q-ndvktVEV0eL1CI8o')
 worksheet = spreadsheet.sheet1
 all_values = worksheet.get_all_values()
 
@@ -30,4 +30,5 @@ def fetch_objects(id):
         except:
             pass
     return objects
+
 
