@@ -1,3 +1,5 @@
+from calendar import month
+
 from aiogram import Router, F
 from aiogram.filters import or_f
 
@@ -72,7 +74,17 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     state_data = await state.get_data()
     month, year = state_data.get('month', datetime.today().month), state_data.get('year', datetime.today().year)
     day = int(callback.data.split("_")[1])
-    keyboard = await keyboards.groups_to_keyboard(True, 0)
+    await database_funcs.add_report(callback.from_user.id, f"{day}.{month}.{year}")
+    keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, True, 0)
+    await callback.message.edit_text(
+        f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
+        f"которыми вы занимались, и, по готовности отчета, нажмите\n*Отправить📨*",
+        parse_mode='Markdown', reply_markup=keyboard)
+
+@router.callback_query(F.data.startswith("back_to_day_"))
+async def groups_menu(callback: CallbackQuery, state: FSMContext):
+    day, month, year = map(int, callback.data.split('_')[3].split('.'))
+    keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, True, 0)
     await callback.message.edit_text(
         f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, по готовности отчета, нажмите\n*Отправить📨*",
@@ -81,5 +93,10 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(or_f(F.data.contains('.'), F.data.isdigit()))
 async def subgroups(callback: CallbackQuery, state: FSMContext):
-    keyboard = await keyboards.groups_to_keyboard(False, callback.data.count('.')+1, callback.data)
-    await callback.message.edit_text("Выберите подгруппу:", reply_markup=keyboard)
+    keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, False, callback.data.count('.') + 1,
+                                                  callback.data)
+    if len(keyboard.inline_keyboard) == 1:
+        print(callback.data)
+    else:
+        await callback.message.edit_text("Выберите подгруппу:", reply_markup=keyboard)
+

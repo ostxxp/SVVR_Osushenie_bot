@@ -1,7 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-import DB.objects_fetching as of
-import DB.groups_fetching as grps
+from DB import objects_fetching, groups_fetching, database_funcs
 
 edit_list = InlineKeyboardMarkup(
     inline_keyboard=[[InlineKeyboardButton(text="Добавить прораба", callback_data="add_prorab"),
@@ -24,17 +23,16 @@ try_prorab_again = InlineKeyboardMarkup(
 
 async def objects_to_keyboard(id):
     buttons = []
-    if of.fetch_objects(id) is not None:
-        for obj in of.fetch_objects(id):
+    if objects_fetching.fetch_objects(id) is not None:
+        for obj in objects_fetching.fetch_objects(id):
             buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
         keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
         return keyboard
     return None
 
-async def groups_to_keyboard(is_general, iteration, group_number = None):
+async def groups_to_keyboard(id, is_general, iteration, group_number = None):
     buttons = []
-    groups = grps.groups
-    print(group_number)
+    groups = groups_fetching.sorted_groups
     for group in groups:
         if group[0].count('.') == iteration:
             if group_number is None or group[0].startswith(f"{group_number}."):
@@ -42,10 +40,12 @@ async def groups_to_keyboard(is_general, iteration, group_number = None):
 
     if is_general:
         buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data="send_report")])
+    elif group_number.count('.') > 0:
+        num = ""
+        for i in range(0, iteration-1):
+            num += group_number.split(".")[i]
+        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=num)])
     else:
-        try:
-            buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"{group_number[:-2]}")])
-        except:
-            buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"{group_number[:-2]}")])
+        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_day_{await database_funcs.get_report_date(id)}")])
     groups = InlineKeyboardMarkup(inline_keyboard=buttons)
     return groups

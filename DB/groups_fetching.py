@@ -9,4 +9,8 @@ groups = []
 for v in all_values[6:]:
     if v[0] != '':
         groups.append(v)
-groups.sort()
+
+def sort_key(item):
+    return tuple(map(int, item[0].split('.')))
+
+sorted_groups = sorted(groups, key=sort_key)
