@@ -34,7 +34,7 @@ async def select_object(callback: CallbackQuery, state: FSMContext):
                                      reply_markup=await inline_calendar.create_calendar(month, year, state))
     object = await objects_fetching.fetch_objects_by_name(obj_name)
     if object[3] == '':
-        objects_fetching.add_link(f"D{int(objects[0]) + 4}", await report_table.create_table_report(objects[1]))
+        objects_fetching.add_link(f"D{int(object[0]) + 4}", await report_table.create_table_report(object[1]))
 
 
 @router.callback_query(F.data == "back_to_objects")
@@ -74,7 +74,12 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     month, year = state_data.get('month', datetime.today().month), state_data.get('year', datetime.today().year)
     day = int(callback.data.split("_")[1])
     keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, True, 0)
-    await database_funcs.add_date(callback.from_user.id, f"{day}.{month}.{year}")
+    date = f"{day}.{month}.{year}"
+    await database_funcs.add_date(callback.from_user.id, date)
+    await callback.message.edit_text("Загрузка...")
+    object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
+    link = object[3]
+    await report_table.fill_value(link, "G2", date)
     await callback.message.edit_text(
         f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, когда заполните все работы, нажмите\n*👨🏻‍🔧 Выбрать рабочих*",
@@ -127,14 +132,15 @@ async def fill_volume(message: Message, state: FSMContext):
     try:
         a = int(message.text)
         try:
-            await msg.edit_text(
-                text=f"Объем: {message.text} ({data.get('quantity')}) Верно?\nЕсли нет, напишите значение ещё раз",
-                reply_markup=keyboard)
+            await msg.edit_text("Загрузка...")
             object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(message.from_user.id))
             link = object[3]
             location = await report_table.find_row(link, data.get('group'))
             value = message.text
             await report_table.fill_value(link, location, value)
+            await msg.edit_text(
+                text=f"Объем: {message.text} ({data.get('quantity')}) Верно?\nЕсли нет, напишите значение ещё раз",
+                reply_markup=keyboard)
         except:
             pass
     except:
