@@ -1,25 +1,10 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from watchfiles import awatch
+
 from DB import objects_fetching, groups_fetching, database_funcs
+from DB import installers_fetching
 
-edit_list = InlineKeyboardMarkup(
-    inline_keyboard=[[InlineKeyboardButton(text="Добавить прораба", callback_data="add_prorab"),
-                      InlineKeyboardButton(text="Удалить прораба", callback_data="remove_prorab")],
-                     [InlineKeyboardButton(text="Настройки администраторов", callback_data="admin_settings")]]
-)
-
-back_to_objects = InlineKeyboardMarkup(
-    inline_keyboard=[[InlineKeyboardButton(text="<-- Вернуться к объектам", callback_data="back_to_objects")]],
-)
-
-role = InlineKeyboardMarkup(
-    inline_keyboard=[[InlineKeyboardButton(text="Я - прораб", callback_data="prorab"),
-                      InlineKeyboardButton(text="Я - монтажник", callback_data="installer")]],
-)
-
-try_prorab_again = InlineKeyboardMarkup(
-    inline_keyboard=[[InlineKeyboardButton(text="🔁 Повторить попытку", callback_data="prorab")]]
-)
 
 async def objects_to_keyboard(id):
     buttons = []
@@ -39,7 +24,7 @@ async def groups_to_keyboard(id, is_general, iteration, group_number = None):
                 buttons.append([InlineKeyboardButton(text=f"{group[0].split('.')[iteration]}. {group[1]}", callback_data=group[0])])
 
     if is_general:
-        buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data="send_report")])
+        buttons.append([InlineKeyboardButton(text="👨🏻‍🔧 Выбрать рабочих", callback_data="installers")])
     elif group_number.count('.') > 0:
         num = '.'.join(group_number.split('.')[:-1])
         buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=num)])
@@ -47,3 +32,16 @@ async def groups_to_keyboard(id, is_general, iteration, group_number = None):
         buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_day_{await database_funcs.get_report_date(id)}")])
     groups = InlineKeyboardMarkup(inline_keyboard=buttons)
     return groups
+
+async def installers_to_keyboard(id):
+    buttons = []
+    for installer in installers_fetching.installers:
+        inst = str(installer[0])
+        if (await database_funcs.get_installers(id) is not None) and installer[0] in (await database_funcs.get_installers(id)):
+            inst = "✅ " + inst
+        buttons.append([InlineKeyboardButton(text=inst, callback_data=f"installer_{installer[0]}")])
+    buttons.append(
+        [InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_day_{await database_funcs.get_report_date(id)}")])
+    buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data="send_report")])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard

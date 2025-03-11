@@ -13,8 +13,6 @@ class Prorab(Base):
 class Report(Base):
     __tablename__ = 'reports'
     prorab_id = Column(Integer, primary_key=True)
-    date = Column(String, primary_key=True)
-    __table_args__ = (
-        PrimaryKeyConstraint('prorab_id', 'date'),
-        {}
-    )
+    date = Column(String)
+    installers = Column(String)
+    object_name = Column(String)

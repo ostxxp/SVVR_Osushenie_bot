@@ -15,9 +15,6 @@ def sort_key(item):
 
 sorted_groups = sorted(groups, key=sort_key)
 
-s = "1.2.3"
-print('.'.join(s.split('.')[:-1]))
-
 async def get_group_name(id):
     name = ""
     for group in sorted_groups:
