@@ -1,9 +1,11 @@
 from aiogram import Router, F
+from aiogram.filters import or_f
 
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from sqlalchemy.testing import fails
 from watchfiles import awatch
 
 import inline_calendar
@@ -70,14 +72,14 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     state_data = await state.get_data()
     month, year = state_data.get('month', datetime.today().month), state_data.get('year', datetime.today().year)
     day = int(callback.data.split("_")[1])
-    keyboard = await keyboards.groups_to_keyboard()
+    keyboard = await keyboards.groups_to_keyboard(True, 0)
     await callback.message.edit_text(
         f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, по готовности отчета, нажмите\n*Отправить📨*",
         parse_mode='Markdown', reply_markup=keyboard)
 
 
-@router.callback_query(F.data.count('.') == 0)
+@router.callback_query(or_f(F.data.contains('.'), F.data.isdigit()))
 async def subgroups(callback: CallbackQuery, state: FSMContext):
-    keyboard = await keyboards.subgroups_to_keyboard(callback.data)
+    keyboard = await keyboards.groups_to_keyboard(False, callback.data.count('.')+1, callback.data)
     await callback.message.edit_text("Выберите подгруппу:", reply_markup=keyboard)

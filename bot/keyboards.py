@@ -31,15 +31,21 @@ async def objects_to_keyboard(id):
         return keyboard
     return None
 
-async def groups_to_keyboard(is_general, group_number):
+async def groups_to_keyboard(is_general, iteration, group_number = None):
     buttons = []
     groups = grps.groups
+    print(group_number)
     for group in groups:
-        if group[0].count('.') == group_number:
-            buttons.append([InlineKeyboardButton(text=f"{group[0].split('.')[group_number]}. {group[1]}", callback_data=group[0])])
+        if group[0].count('.') == iteration:
+            if group_number is None or group[0].startswith(f"{group_number}."):
+                buttons.append([InlineKeyboardButton(text=f"{group[0].split('.')[iteration]}. {group[1]}", callback_data=group[0])])
+
     if is_general:
         buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data="send_report")])
     else:
-        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_{group_number-1}")])
+        try:
+            buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"{group_number[:-2]}")])
+        except:
+            buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"{group_number[:-2]}")])
     groups = InlineKeyboardMarkup(inline_keyboard=buttons)
     return groups

@@ -8,6 +8,7 @@ class Prorab(Base):
     id = Column(Integer, primary_key=True)
     is_filled = Column(Integer)
 
-class Installer(Base):
-    __tablename__ = 'installers'
-    id = Column(Integer, primary_key=True)
+class Report(Base):
+    __tablename__ = 'reports'
+    filler_id = Column(Integer, primary_key=True)
+
