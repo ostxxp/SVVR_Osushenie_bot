@@ -7,13 +7,13 @@ from aiogram.types import Message
 from DB import database_funcs
 
 import keyboards
-from DB.prorabs_fetching import prorabs
 
 router = Router()
 
 
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
+    await database_funcs.clear_reports(message.from_user.id)
     keyboard = await keyboards.objects_to_keyboard(message.from_user.id)
     if keyboard is not None:
         await message.answer("Здравствуй! Выбери объект:", reply_markup=keyboard)

@@ -1,6 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from watchfiles import awatch
 
 from DB import objects_fetching, groups_fetching, database_funcs
 from DB import installers_fetching
@@ -8,8 +7,8 @@ from DB import installers_fetching
 
 async def objects_to_keyboard(id):
     buttons = []
-    if objects_fetching.fetch_objects(id) is not None:
-        for obj in objects_fetching.fetch_objects(id):
+    if (await objects_fetching.fetch_objects_names(id)) is not None:
+        for obj in (await objects_fetching.fetch_objects_names(id)):
             buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
         keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
         return keyboard
@@ -42,6 +41,6 @@ async def installers_to_keyboard(id):
         buttons.append([InlineKeyboardButton(text=inst, callback_data=f"installer_{installer[0]}")])
     buttons.append(
         [InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_day_{await database_funcs.get_report_date(id)}")])
-    buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data="send_report")])
+    buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data=f"submit_{await database_funcs.get_report_date(id)}")])
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard

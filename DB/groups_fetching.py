@@ -8,7 +8,7 @@ all_values = worksheet.get_all_values()
 groups = []
 for v in all_values[6:]:
     if v[0] != '':
-        groups.append(v)
+        groups.append(v[0:3])
 
 def sort_key(item):
     return tuple(map(int, item[0].split('.')))

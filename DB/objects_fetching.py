@@ -11,7 +11,7 @@ data = all_values[4:]
 
 
 
-def fetch_objects(id):
+async def fetch_objects_names(id):
     for prorab in prorabs:
         if int(prorab[0]) == id:
             name = prorab[1]
@@ -27,5 +27,13 @@ def fetch_objects(id):
             pass
     return objects
 
+async def fetch_objects_by_name(name):
+    for d in data:
+        if d[1] == name:
+            return d
+
+
+def add_link(location, link):
+    worksheet.update(location, [[link]])
 
 

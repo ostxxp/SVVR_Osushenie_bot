@@ -19,6 +19,16 @@ async def is_filled(id):
     db.close()
     return False
 
+async def filled(id, flag):
+    prorab = db.query(Prorab).filter_by(id=id).first()
+    if prorab:
+        if flag:
+            prorab.is_filled = 1
+        else:
+            prorab.is_filled = 0
+        db.commit()
+        db.close()
+
 async def get_prorabs():
     return db.query(Prorab).all()
 
@@ -48,7 +58,10 @@ async def get_installers(id):
 async def add_installer(id, installer):
     report = db.query(Report).filter_by(prorab_id=id).first()
     if report:
-        report.installers = db.query(Report).filter_by(prorab_id=id).first().installers + installer + " "
+        text = ""
+        if db.query(Report).filter_by(prorab_id=id).first().installers is not None:
+            text = db.query(Report).filter_by(prorab_id=id).first().installers
+        report.installers = text + installer + " "
         db.commit()
         db.close()
 
@@ -56,7 +69,18 @@ async def remove_installer(id, installer):
     report = db.query(Report).filter_by(prorab_id=id).first()
     if report:
         installers = db.query(Report).filter_by(prorab_id=id).first().installers
-        installers.replace(f"{installer} ", "")
+        installers = installers.replace(f"{installer} ", "")
         report.installers = installers
         db.commit()
         db.close()
+
+async def clear_reports(id):
+    report = db.query(Report).filter_by(prorab_id=id).first()
+    if report:
+        db.delete(report)
+        db.commit()
+        db.close()
+
+
+async def get_obj_name(id):
+    return db.query(Report).filter_by(prorab_id=id).first().object_name
