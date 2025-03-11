@@ -7,12 +7,8 @@ all_values = worksheet.get_all_values()
 
 
 headers = all_values[3]
-data_temp = all_values[4:]
+data = all_values[4:]
 
-data = []
-
-for d in data_temp:
-    data.append(list(filter(lambda x: any(x), d))[:3])
 
 
 def fetch_objects(id):
@@ -30,5 +26,6 @@ def fetch_objects(id):
         except:
             pass
     return objects
+
 
 

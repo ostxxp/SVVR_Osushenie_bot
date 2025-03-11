@@ -41,9 +41,7 @@ async def groups_to_keyboard(id, is_general, iteration, group_number = None):
     if is_general:
         buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data="send_report")])
     elif group_number.count('.') > 0:
-        num = ""
-        for i in range(0, iteration-1):
-            num += group_number.split(".")[i]
+        num = '.'.join(group_number.split('.')[:-1])
         buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=num)])
     else:
         buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_day_{await database_funcs.get_report_date(id)}")])

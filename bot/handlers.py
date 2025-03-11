@@ -8,6 +8,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from sqlalchemy.testing import fails
+from typer.cli import callback
 from watchfiles import awatch
 
 import inline_calendar
@@ -15,6 +16,8 @@ from bot.keyboards import back_to_objects
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from months import months, months_selected
+
+from DB import groups_fetching
 
 from states import States
 
@@ -81,6 +84,7 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
         f"которыми вы занимались, и, по готовности отчета, нажмите\n*Отправить📨*",
         parse_mode='Markdown', reply_markup=keyboard)
 
+
 @router.callback_query(F.data.startswith("back_to_day_"))
 async def groups_menu(callback: CallbackQuery, state: FSMContext):
     day, month, year = map(int, callback.data.split('_')[3].split('.'))
@@ -96,7 +100,36 @@ async def subgroups(callback: CallbackQuery, state: FSMContext):
     keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, False, callback.data.count('.') + 1,
                                                   callback.data)
     if len(keyboard.inline_keyboard) == 1:
-        print(callback.data)
+        back = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text="🔙 Назад", callback_data='.'.join(callback.data.split('.')[:-1]))]]
+        )
+        msg = await callback.message.edit_text(
+            f"Вы выбрали:\n\n*{await groups_fetching.get_group_name(callback.data)}*.\n\n"
+            f"Теперь укажите выполненный объем({await groups_fetching.get_work_type(callback.data)}). Напишите *только число*.",
+            parse_mode='Markdown', reply_markup=back)
+        await state.update_data(message=msg)
+        await state.update_data(group=callback.data)
+        await state.update_data(quantity=await groups_fetching.get_work_type(callback.data))
+        await state.set_state(States.fill_volume)
     else:
         await callback.message.edit_text("Выберите подгруппу:", reply_markup=keyboard)
 
+@router.message(States.fill_volume)
+async def fill_volume(message: Message, state: FSMContext):
+    data = await state.get_data()
+    msg = data.get('message')
+    await message.delete()
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="✅ Да", callback_data="confirm")],
+            [InlineKeyboardButton(text="🔙 Назад", callback_data=data.get('group'))],
+        ]
+    )
+    await msg.edit_text(text=f"Объем: {message.text} ({data.get('quantity')}) Верно?", reply_markup=keyboard)
+
+@router.callback_query(F.data == "confirm")
+async def confirm(message: Message, state: FSMContext):
+    data = await state.get_data()
+    msg = data.get('message')
+    await msg.edit_text(text="Выберите монтажников, которые присутствовали на объекте:", reply_markup=)
