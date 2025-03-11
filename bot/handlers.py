@@ -24,42 +24,6 @@ from DB import database_funcs
 router = Router()
 
 
-@router.callback_query(F.data == "prorab")
-async def handle_prorab(callback: CallbackQuery, state: FSMContext):
-    if await prorabs_fetching.is_prorab(callback.from_user.id):
-        await database_funcs.add_prorab(callback.from_user.id)
-        await callback.message.edit_text("Теперь вы зарегистрированы в боте. "
-                                         "Чтобы заполнить дневной отчет по объекту напишите /fill "
-                                         "(либо нажмите на эту команду)")
-    elif callback.message.text != "Кажется, что вы не прораб":
-        await callback.message.edit_text("Кажется, что вы не прораб", reply_markup=keyboards.try_prorab_again)
-
-
-
-@router.callback_query(F.data == "installer")
-async def handle_prorab(callback: CallbackQuery, state: FSMContext):
-    installer = True
-    if installer:  # Есть ли прораб в таблице
-        await database_funcs.add_installer(callback.from_user.id)
-        await callback.message.edit_text("Теперь вы зарегистрированы в боте. "
-                                         "Вам будут приходить информационные сообщения о заполнении ведомостей прорабами")
-
-
-@router.message(Command("fill"))
-async def fill_report(message: Message, state: FSMContext):
-    if not await db.prorab_exists(message.from_user.id):
-        await message.answer("Для заполнения отчетов нужно зарегистрироваться в боте. Для этого просто напишите /start")
-    else:
-        if await prorabs_fetching.is_prorab(message.from_user.id):
-            keyboard = await keyboards.objects_to_keyboard(message.from_user.id)
-            if keyboard is not None:
-                await message.answer("Выбери объект:", reply_markup=keyboard)
-            else:
-                await message.answer("Похоже, что вам не назначен ни один объект.")
-        else:
-            await message.answer("Кажется, что вы не прораб")
-
-
 @router.callback_query(F.data.startswith("obj_"))
 async def select_object(callback: CallbackQuery, state: FSMContext):
     month = datetime.today().month

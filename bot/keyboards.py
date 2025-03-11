@@ -31,22 +31,15 @@ async def objects_to_keyboard(id):
         return keyboard
     return None
 
-async def groups_to_keyboard():
+async def groups_to_keyboard(is_general, group_number):
     buttons = []
     groups = grps.groups
     for group in groups:
-        if group[0].count('.') == 0 and group[0] == '1':
-            buttons.append([InlineKeyboardButton(text=f"{group[0]}. {group[1]}", callback_data=group[0])])
-    buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data="send_report")])
+        if group[0].count('.') == group_number:
+            buttons.append([InlineKeyboardButton(text=f"{group[0].split('.')[group_number]}. {group[1]}", callback_data=group[0])])
+    if is_general:
+        buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data="send_report")])
+    else:
+        buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_{group_number-1}")])
     groups = InlineKeyboardMarkup(inline_keyboard=buttons)
     return groups
-
-async def subgroups_to_keyboard(id):
-    buttons = []
-    subgroups = grps.groups
-    for group in subgroups:
-        if group[0].count('.') == 1 and group[0].startswith(f'{id}.'):
-            buttons.append([InlineKeyboardButton(text=f"{group[0].split('.')[1]}. {group[1]}", callback_data=group[0])])
-    buttons.append([InlineKeyboardButton(text="🔙 Назад к группам", callback_data="j")])
-    subgroups = InlineKeyboardMarkup(inline_keyboard=buttons)
-    return subgroups
