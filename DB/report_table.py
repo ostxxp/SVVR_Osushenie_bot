@@ -15,15 +15,23 @@ async def create_table_report(name):
 
     return spreadsheet.url
 
-async def find_row(link, number):
+async def find_row(link, number, date):
     spreadsheet = client.open_by_key(link.split('/')[5])
     worksheet = spreadsheet.sheet1
     all_values = worksheet.get_all_values()
     for i in range(len(all_values)):
         if all_values[i][0] == number:
-            return f"G{i+1}"
+            return f"{(await find_date(link, date))[0]}{i+1}"
 
 async def fill_value(link, location, value):
     spreadsheet = client.open_by_key(link.split('/')[5])
     worksheet = spreadsheet.sheet1
     worksheet.update(location, [[value]])
+
+async def find_date(link, date):
+    spreadsheet = client.open_by_key(link.split('/')[5])
+    worksheet = spreadsheet.sheet1
+    values = worksheet.row_values(2)
+    for i in range(6, len(values)):
+        if values[i] == date or values[i] == '':
+            return f"{chr(ord("A") + i + 1)}2"

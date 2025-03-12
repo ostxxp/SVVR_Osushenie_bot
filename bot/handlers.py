@@ -29,12 +29,13 @@ async def select_object(callback: CallbackQuery, state: FSMContext):
     year = datetime.today().year
     obj_name = callback.data.split('_', 2)[2]
     await database_funcs.add_report(id=callback.from_user.id, object_name=obj_name)
-    await callback.message.edit_text(f"Выберите дату для объекта\n*{obj_name}*",
-                                     parse_mode='Markdown',
-                                     reply_markup=await inline_calendar.create_calendar(month, year, state))
     object = await objects_fetching.fetch_objects_by_name(obj_name)
     if object[3] == '':
         objects_fetching.add_link(f"D{int(object[0]) + 4}", await report_table.create_table_report(object[1]))
+        await callback.message.edit_text("Создане таблицы...")
+    await callback.message.edit_text(f"Выберите дату для объекта\n*{obj_name}*",
+                                     parse_mode='Markdown',
+                                     reply_markup=await inline_calendar.create_calendar(month, year, state))
 
 
 @router.callback_query(F.data == "back_to_objects")
@@ -79,7 +80,7 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Загрузка...")
     object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
     link = object[3]
-    await report_table.fill_value(link, "G2", date)
+    await report_table.fill_value(link, await report_table.find_date(link, date), date)
     await callback.message.edit_text(
         f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, когда заполните все работы, нажмите\n*👨🏻‍🔧 Выбрать рабочих*",
@@ -135,7 +136,7 @@ async def fill_volume(message: Message, state: FSMContext):
             await msg.edit_text("Загрузка...")
             object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(message.from_user.id))
             link = object[3]
-            location = await report_table.find_row(link, data.get('group'))
+            location = await report_table.find_row(link, data.get('group'), await database_funcs.get_report_date(message.from_user.id))
             value = message.text
             await report_table.fill_value(link, location, value)
             await msg.edit_text(
