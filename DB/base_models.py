@@ -16,3 +16,5 @@ class Report(Base):
     date = Column(String)
     installers = Column(String)
     object_name = Column(String)
+    column = Column(String)
+    prorab_name = Column(String)

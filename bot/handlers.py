@@ -5,6 +5,8 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from typer.cli import callback
+
 import inline_calendar
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -12,7 +14,7 @@ from DB import report_table
 
 from months import months_selected
 
-from DB import groups_fetching, objects_fetching
+from DB import groups_fetching, objects_fetching, prorabs_fetching
 
 from states import States
 
@@ -25,14 +27,11 @@ router = Router()
 
 @router.callback_query(F.data.startswith("obj_"))
 async def select_object(callback: CallbackQuery, state: FSMContext):
+
     month = datetime.today().month
     year = datetime.today().year
     obj_name = callback.data.split('_', 2)[2]
-    await database_funcs.add_report(id=callback.from_user.id, object_name=obj_name)
-    object = await objects_fetching.fetch_objects_by_name(obj_name)
-    if object[3] == '':
-        objects_fetching.add_link(f"D{int(object[0]) + 4}", await report_table.create_table_report(object[1]))
-        await callback.message.edit_text("Создане таблицы...")
+    await database_funcs.add_report(id=callback.from_user.id, object_name=obj_name, prorab_name=await prorabs_fetching.get_prorab_name(callback.from_user.id))
     await callback.message.edit_text(f"Выберите дату для объекта\n*{obj_name}*",
                                      parse_mode='Markdown',
                                      reply_markup=await inline_calendar.create_calendar(month, year, state))
@@ -80,7 +79,8 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Загрузка...")
     object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
     link = object[3]
-    await report_table.fill_value(link, await report_table.find_date(link, date), date)
+    location = await report_table.find_date(callback.from_user.id, link, date)
+    await report_table.fill_value(link, location, date)
     await callback.message.edit_text(
         f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, когда заполните все работы, нажмите\n*👨🏻‍🔧 Выбрать рабочих*",
@@ -136,7 +136,7 @@ async def fill_volume(message: Message, state: FSMContext):
             await msg.edit_text("Загрузка...")
             object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(message.from_user.id))
             link = object[3]
-            location = await report_table.find_row(link, data.get('group'), await database_funcs.get_report_date(message.from_user.id))
+            location = await report_table.find_row(message.from_user.id, link, data.get('group'), await database_funcs.get_report_date(message.from_user.id))
             value = message.text
             await report_table.fill_value(link, location, value)
             await msg.edit_text(
