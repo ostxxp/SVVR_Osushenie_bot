@@ -1,28 +1,31 @@
 from DB.docs_fetching import client
 from DB.groups_fetching import sorted_groups
-from DB import database_funcs
+from DB import database_funcs, objects_fetching
 
-async def create_table_report(name):
-    spreadsheet = client.create(name)
-    worksheet = spreadsheet.sheet1
-    worksheet.update("A1:F1", [["Наименование работ", "", "Ед. Изм.", "Общее кол-во", "Всего сделано", "Осталось сделать"]])
-    worksheet.update("B2", [["Дата"]])
-    for i in range(len(sorted_groups)):
-        worksheet.update(f"A{i+3}:C{i+3}", [sorted_groups[i]])
-
-    spreadsheet.share(None, perm_type="anyone", role="reader")
-    spreadsheet.share("osushenie.rf@gmail.com", perm_type="user", role="writer")
-    spreadsheet.share("osusheniesvvr@gmail.com", perm_type="user", role="writer")
-
-    return spreadsheet.url
-
-async def find_row(id, link, number, date):
+async def create_table_report(id):
+    object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(id))
+    link = object[3]
+    with open(f'../report_info/{id}.txt', 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+    print(lines)
     spreadsheet = client.open_by_key(link.split('/')[5])
     worksheet = spreadsheet.sheet1
     all_values = worksheet.get_all_values()
-    for i in range(len(all_values)):
-        if all_values[i][0] == number:
-            return f"{(await database_funcs.get_column(id))[0]}{i+1}"
+    column = await database_funcs.get_column(id)
+    worksheet.update(f"{column}2", [[lines[0]]])
+    for k in range(1, len(lines)-1):
+        for i in range(len(all_values)):
+            if str(lines[k].split()[0]) == (all_values[i][0]):
+                worksheet.update(f"{column}{i+1}", [[lines[k].split()[1].strip()]])
+                break
+
+# async def find_row(id, link, number):
+#     spreadsheet = client.open_by_key(link.split('/')[5])
+#     worksheet = spreadsheet.sheet1
+#     all_values = worksheet.get_all_values()
+#     for i in range(len(all_values)):
+#         if all_values[i][0] == number:
+#             return f"{(await database_funcs.get_column(id))[0]}{i+1}"
 
 async def fill_value(link, location, value):
     spreadsheet = client.open_by_key(link.split('/')[5])

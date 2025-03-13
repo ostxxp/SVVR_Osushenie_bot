@@ -27,7 +27,6 @@ router = Router()
 
 @router.callback_query(F.data.startswith("obj_"))
 async def select_object(callback: CallbackQuery, state: FSMContext):
-
     month = datetime.today().month
     year = datetime.today().year
     obj_name = callback.data.split('_', 2)[2]
@@ -75,12 +74,14 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     day = int(callback.data.split("_")[1])
     keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, True, 0)
     date = f"{day}.{month}.{year}"
+    with open(f'../report_info/{callback.from_user.id}.txt', 'w', encoding='utf-8') as file:
+        file.write(date + '\n')
     await database_funcs.add_date(callback.from_user.id, date)
-    await callback.message.edit_text("Загрузка...")
+    # await callback.message.edit_text("Загрузка...")
     object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
     link = object[3]
-    location = await report_table.find_date(callback.from_user.id, link, date)
-    await report_table.fill_value(link, location, date)
+    await report_table.find_date(callback.from_user.id, link, date)
+    # await report_table.fill_value(link, location, date)
     await callback.message.edit_text(
         f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, когда заполните все работы, нажмите\n*👨🏻‍🔧 Выбрать рабочих*",
@@ -133,22 +134,23 @@ async def fill_volume(message: Message, state: FSMContext):
     try:
         a = int(message.text)
         try:
-            await msg.edit_text("Загрузка...")
-            object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(message.from_user.id))
-            link = object[3]
-            location = await report_table.find_row(message.from_user.id, link, data.get('group'), await database_funcs.get_report_date(message.from_user.id))
-            value = message.text
-            await report_table.fill_value(link, location, value)
+            # object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(message.from_user.id))
+            # link = object[3]
+            # location = await report_table.find_row(message.from_user.id, link, data.get('group'), await database_funcs.get_report_date(message.from_user.id))
+            # value = message.text
+            # await report_table.fill_value(link, location, value)
             await msg.edit_text(
                 text=f"Объем: {message.text} ({data.get('quantity')}) Верно?\nЕсли нет, напишите значение ещё раз",
                 reply_markup=keyboard)
-        except:
-            pass
+            with open(f"../report_info/{message.from_user.id}.txt", 'a', encoding='utf-8') as file:
+                file.write(f'{data.get('group')} {message.text}\n')
+        except Exception as e:
+            print(e)
     except:
         try:
             await msg.edit_text(text=f"Нужно указать только число.")
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
 
 @router.callback_query(F.data == "installers")
@@ -171,6 +173,10 @@ async def installer_selection(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data.startswith("submit_"))
 async def submit(callback: CallbackQuery, state: FSMContext):
+    with open(f'../report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
+        file.write(f"Монтажники {', '.join((await database_funcs.get_installers(callback.from_user.id)).split(','))[:-1]}")
+    await callback.message.edit_text("Загружаю данные в таблицу...")
+    await report_table.create_table_report(callback.from_user.id)
     day, month, year = map(int, callback.data.split('_')[1].split('.'))
     await callback.message.edit_text(f"✅ Дневной отчет за *{day} {months_selected[month]} {year}* заполнен!"
                                      f"\nЧтобы заполнить ещё один отчет, напишите команду /start",

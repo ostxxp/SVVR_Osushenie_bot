@@ -61,7 +61,7 @@ async def add_installer(id, installer):
         text = ""
         if db.query(Report).filter_by(prorab_id=id).first().installers is not None:
             text = db.query(Report).filter_by(prorab_id=id).first().installers
-        report.installers = text + installer + " "
+        report.installers = text + installer + ","
         db.commit()
         db.close()
 
