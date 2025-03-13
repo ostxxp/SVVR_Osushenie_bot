@@ -181,5 +181,6 @@ async def submit(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(f"✅ Дневной отчет за *{day} {months_selected[month]} {year}* заполнен!"
                                      f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
                                      parse_mode='Markdown')
-    await database_funcs.filled(callback.from_user.id, True)
+    if day == datetime.today().day and month == datetime.today().month and year == datetime.today().year:
+        await database_funcs.filled(callback.from_user.id, True)
     await database_funcs.clear_reports(callback.from_user.id)
