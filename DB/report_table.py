@@ -7,7 +7,6 @@ async def create_table_report(id):
     link = object[3]
     with open(f'../report_info/{id}.txt', 'r', encoding='utf-8') as file:
         lines = file.readlines()
-    print(lines)
     spreadsheet = client.open_by_key(link.split('/')[5])
     worksheet = spreadsheet.sheet1
     all_values = worksheet.get_all_values()

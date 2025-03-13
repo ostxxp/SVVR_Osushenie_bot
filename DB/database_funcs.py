@@ -69,7 +69,7 @@ async def remove_installer(id, installer):
     report = db.query(Report).filter_by(prorab_id=id).first()
     if report:
         installers = db.query(Report).filter_by(prorab_id=id).first().installers
-        installers = installers.replace(f"{installer} ", "")
+        installers = installers.replace(f"{installer},", "")
         report.installers = installers
         db.commit()
         db.close()
