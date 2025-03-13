@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.filters import or_f, and_f
+import os
 
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
@@ -184,3 +185,7 @@ async def submit(callback: CallbackQuery, state: FSMContext):
     if day == datetime.today().day and month == datetime.today().month and year == datetime.today().year:
         await database_funcs.filled(callback.from_user.id, True)
     await database_funcs.clear_reports(callback.from_user.id)
+    try:
+        os.remove(f"../report_info/{callback.from_user.id}.txt")
+    except FileNotFoundError:
+        print(f"The file ../report_info/{callback.from_user.id}.txt was not found")
