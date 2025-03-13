@@ -1,6 +1,8 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+import textwrap
+
 from DB import objects_fetching, groups_fetching, database_funcs
 from DB import installers_fetching
 
@@ -20,7 +22,11 @@ async def groups_to_keyboard(id, is_general, iteration, group_number = None):
     for group in groups:
         if group[0].count('.') == iteration:
             if group_number is None or group[0].startswith(f"{group_number}."):
-                buttons.append([InlineKeyboardButton(text=f"{group[0].split('.')[iteration]}. {group[1]}", callback_data=group[0])])
+                if len(group[1]) > 85:
+                    name = f"{group[1][:85]}..."
+                else:
+                    name = group[1]
+                buttons.append([InlineKeyboardButton(text=f"{group[0]}. {name}", callback_data=group[0])])
 
     if is_general:
         buttons.append([InlineKeyboardButton(text="👨🏻‍🔧 Выбрать рабочих", callback_data="installers")])
