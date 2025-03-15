@@ -41,11 +41,10 @@ async def fill_zeros(id):
 
     with open(f'../report_info/{id}.txt', 'r', encoding='utf-8') as file:
         date = file.readlines()
-
-    worksheet.update(f"{column}2", [[date]])
+    worksheet.update(f"{column}2", [[date[0].strip()]])
 
     for i in range(2, len(all_values)):
-        if all_values[i][5] != "Рабочие" and all_values[i][0].count(".") > 0:
+        if all_values[i][5] != "Рабочие" and all_values[i][0].count(".") > 0 and all_values[i][2] != '':
             worksheet.update(f"{column}{i+1}", [['0']])
 
 async def fill_value(link, location, value):

@@ -5,7 +5,6 @@ import os
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from google.auth import message
 
 import inline_calendar
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -72,8 +71,13 @@ async def next_month(callback: CallbackQuery, state: FSMContext):
 async def select_day(callback: CallbackQuery, state: FSMContext):
     state_data = await state.get_data()
     month, year = state_data.get('month', datetime.today().month), state_data.get('year', datetime.today().year)
-    day = int(callback.data.split("_")[1])
-    date = f"{day}.{month}.{year}"
+    day = callback.data.split("_")[1]
+    str_month = str(month)
+    if len(day) == 1:
+        day = '0' + day
+    if len(str_month) == 1:
+        str_month = '0' + str_month
+    date = f"{day}.{str_month}.{year}"
     with open(f'../report_info/{callback.from_user.id}.txt', 'w', encoding='utf-8') as file:
         file.write(date + '\n')
     await database_funcs.add_date(callback.from_user.id, date)
@@ -81,7 +85,7 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     link = obj[3]
     await report_table.find_date(callback.from_user.id, link, date)
     await callback.message.edit_text(f"Проводились ли работы *{day} {months_selected[month]} {year}*?",
-                                     reply_markup=keyboards.yes_no_keyboard)
+                                     reply_markup=keyboards.yes_no_keyboard, parse_mode='Markdown')
 
 @router.callback_query(F.data == "yes")
 async def yes(callback: CallbackQuery):
@@ -174,18 +178,18 @@ async def installer_selection(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("submit_"))
 async def submit(callback: CallbackQuery):
+    await callback.message.edit_text("Загружаю данные в таблицу...")
     if callback.data.split('_')[1] == 'no':
         day, month, year = map(int, (await database_funcs.get_report_date(callback.from_user.id)).split('.'))
         await report_table.fill_zeros(callback.from_user.id)
     else:
         with open(f'../report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
             file.write(f"Монтажники {(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
-        await callback.message.edit_text("Загружаю данные в таблицу...")
         await report_table.create_table_report(callback.from_user.id)
         day, month, year = map(int, callback.data.split('_')[1].split('.'))
-        await callback.message.edit_text(f"✅ Дневной отчет за *{day} {months_selected[month]} {year}* заполнен!"
-                                         f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
-                                         parse_mode='Markdown')
+    await callback.message.edit_text(f"✅ Дневной отчет за *{day} {months_selected[month]} {year}* заполнен!"
+                                     f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
+                                     parse_mode='Markdown')
     if day == datetime.today().day and month == datetime.today().month and year == datetime.today().year:
         await database_funcs.filled(callback.from_user.id, True)
     await database_funcs.clear_reports(callback.from_user.id)
