@@ -23,11 +23,13 @@ async def create_table_report(id):
             if str(lines[k].split()[0]) == (all_values[i][0]):
                 worksheet.update(f"{column}{i+1}", [[lines[k].split()[1].strip()]])
                 break
+    print(lines[-1].split(','))
     for i in range(len(all_values)):
         if all_values[i][5] == "Рабочие":
             k = i+1
-            for installer in lines[-1].split(','):
+            for installer in sorted(lines[-1].split(',')):
                 worksheet.update(f"{column}{k}", [[installer]])
+                k += 1
 
 async def fill_zeros(id):
     object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(id))

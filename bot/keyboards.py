@@ -42,13 +42,24 @@ async def groups_to_keyboard(id, is_general, iteration, group_number = None):
     groups = InlineKeyboardMarkup(inline_keyboard=buttons)
     return groups
 
-async def installers_to_keyboard(id):
+async def installers_to_keyboard(id, filter=None):
     buttons = []
-    for installer in installers_fetching.installers:
-        inst = str(installer[1])
-        if (await database_funcs.get_installers(id) is not None) and installer[1] in (await database_funcs.get_installers(id)):
-            inst = "✅ " + inst
-        buttons.append([InlineKeyboardButton(text=inst, callback_data=f"installer_{installer[1]}")])
+    if filter is None:
+        for installer in installers_fetching.installers[:5]:
+            inst = str(installer[1])
+            if (await database_funcs.get_installers(id) is not None) and installer[1] in (await database_funcs.get_installers(id)):
+                inst = "✅ " + inst
+            buttons.append([InlineKeyboardButton(text=inst, callback_data=f"installer_{installer[1]}")])
+        buttons.append(
+            [InlineKeyboardButton(text="...", callback_data=f"none")]
+        )
+    else:
+        for installer in installers_fetching.installers:
+            inst = str(installer[1])
+            if inst.lower().startswith(filter):
+                if (await database_funcs.get_installers(id) is not None) and installer[1] in (await database_funcs.get_installers(id)):
+                    inst = "✅ " + inst
+                buttons.append([InlineKeyboardButton(text=inst, callback_data=f"installer_{installer[1]}")])
     buttons.append(
         [InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_day_{await database_funcs.get_report_date(id)}")])
     buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data=f"submit_{await database_funcs.get_report_date(id)}")])

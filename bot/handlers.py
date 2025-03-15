@@ -159,9 +159,19 @@ async def fill_volume(message: Message, state: FSMContext):
 
 
 @router.callback_query(F.data == "installers")
-async def confirm(callback: CallbackQuery):
-    await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:",
+async def confirm(callback: CallbackQuery, state: FSMContext):
+    msg = await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:",
                                      reply_markup=await keyboards.installers_to_keyboard(callback.from_user.id))
+    await state.update_data(message=msg)
+    await state.set_state(States.wait_for_filter)
+
+@router.message(States.wait_for_filter)
+async def wait_for_filter(message: Message, state: FSMContext):
+    await message.delete()
+    data = await state.get_data()
+    msg = data.get('message')
+    await msg.edit_text(text=f"Работники, имена которых начинаются с {message.text}:",
+                                     reply_markup=await keyboards.installers_to_keyboard(message.from_user.id, message.text.lower().strip()))
 
 
 @router.callback_query(F.data.startswith("installer_"))
