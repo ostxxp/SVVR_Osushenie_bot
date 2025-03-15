@@ -1,7 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-import textwrap
 
 from DB import objects_fetching, groups_fetching, database_funcs
 from DB import installers_fetching

@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Table, PrimaryKeyConstraint
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy import Column, Integer, String
 
 from DB.database import Base, engine
 
