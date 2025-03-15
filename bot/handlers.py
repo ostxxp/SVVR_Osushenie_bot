@@ -2,11 +2,9 @@ from aiogram import Router, F
 from aiogram.filters import or_f, and_f
 import os
 
-from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from typer.cli import callback
 
 import inline_calendar
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -78,11 +76,9 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     with open(f'../report_info/{callback.from_user.id}.txt', 'w', encoding='utf-8') as file:
         file.write(date + '\n')
     await database_funcs.add_date(callback.from_user.id, date)
-    # await callback.message.edit_text("Загрузка...")
-    object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
-    link = object[3]
+    obj = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
+    link = obj[3]
     await report_table.find_date(callback.from_user.id, link, date)
-    # await report_table.fill_value(link, location, date)
     await callback.message.edit_text(
         f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, когда заполните все работы, нажмите\n*👨🏻‍🔧 Выбрать рабочих*",
@@ -135,11 +131,6 @@ async def fill_volume(message: Message, state: FSMContext):
     try:
         a = int(message.text)
         try:
-            # object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(message.from_user.id))
-            # link = object[3]
-            # location = await report_table.find_row(message.from_user.id, link, data.get('group'), await database_funcs.get_report_date(message.from_user.id))
-            # value = message.text
-            # await report_table.fill_value(link, location, value)
             await msg.edit_text(
                 text=f"Объем: {message.text} ({data.get('quantity')}) Верно?\nЕсли нет, напишите значение ещё раз",
                 reply_markup=keyboard)
@@ -155,13 +146,13 @@ async def fill_volume(message: Message, state: FSMContext):
 
 
 @router.callback_query(F.data == "installers")
-async def confirm(callback: CallbackQuery, state: FSMContext):
+async def confirm(callback: CallbackQuery):
     await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:",
                                      reply_markup=await keyboards.installers_to_keyboard(callback.from_user.id))
 
 
 @router.callback_query(F.data.startswith("installer_"))
-async def installer_selection(callback: CallbackQuery, state: FSMContext):
+async def installer_selection(callback: CallbackQuery):
     installer = callback.data.split('_')[1]
     installers = await database_funcs.get_installers(callback.from_user.id)
     if installers and installer in installers:
@@ -173,7 +164,7 @@ async def installer_selection(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data.startswith("submit_"))
-async def submit(callback: CallbackQuery, state: FSMContext):
+async def submit(callback: CallbackQuery):
     with open(f'../report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
         file.write(f"Монтажники {(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
     await callback.message.edit_text("Загружаю данные в таблицу...")
