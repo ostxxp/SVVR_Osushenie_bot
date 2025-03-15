@@ -180,15 +180,18 @@ async def fill_volume(message: Message, state: FSMContext):
                 print(e)
     except:
         try:
-            await msg.edit_text(text=f"Нужно указать только число.")
+            await msg.edit_text(text=f"Нужно указать только число. Попробуйте ещё раз")
         except Exception as e:
             print(e)
 
 
 @router.callback_query(F.data == "installers")
 async def confirm(callback: CallbackQuery, state: FSMContext):
-    msg = await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:",
-                                           reply_markup=await keyboards.installers_to_keyboard(callback.from_user.id))
+    msg = await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:\n"
+                                                "_(Вы можете отфильтровать рабочих по фамилии. Для этого просто "
+                                                "напишите желаемое начало фамилии работника)_",
+                                           reply_markup=await keyboards.installers_to_keyboard(callback.from_user.id),
+                                           parse_mode='Markdown')
     await state.update_data(message=msg)
     await state.set_state(States.wait_for_filter)
 
