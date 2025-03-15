@@ -1,12 +1,12 @@
 from DB.docs_fetching import client
 
-spreadsheet = client.open_by_key("1mAPOj4jqSYw8E7ZolNr-gVbdjHoVYERdW_zBbhNzoLQ")
+spreadsheet = client.open_by_key("1r6ByCgCV2SmeqdBwAxi1nVMJ8XJVJMv_drFAPShBB_w")
 
 worksheet = spreadsheet.sheet1
 all_values = worksheet.get_all_values()
 
 groups = []
-for v in all_values[6:]:
+for v in all_values[2:]:
     if v[0] != '':
         groups.append(v[0:3])
 

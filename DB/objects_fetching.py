@@ -1,7 +1,7 @@
 from DB.docs_fetching import client
 from DB.prorabs_fetching import prorabs
 
-spreadsheet = client.open_by_key('14_vnU5vfVVct8XNBgd8l9B-m05nuSV_nfT7zZpeYp94')
+spreadsheet = client.open_by_key('1OtnMFqU6-m-JsWyFX2GLG6HksRd18K0su4-INlcjN8A')
 worksheet = spreadsheet.sheet1
 all_values = worksheet.get_all_values()
 
