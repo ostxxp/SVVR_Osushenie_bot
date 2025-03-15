@@ -17,14 +17,11 @@ async def create_table_report(id):
             if str(lines[k].split()[0]) == (all_values[i][0]):
                 worksheet.update(f"{column}{i+1}", [[lines[k].split()[1].strip()]])
                 break
-
-# async def find_row(id, link, number):
-#     spreadsheet = client.open_by_key(link.split('/')[5])
-#     worksheet = spreadsheet.sheet1
-#     all_values = worksheet.get_all_values()
-#     for i in range(len(all_values)):
-#         if all_values[i][0] == number:
-#             return f"{(await database_funcs.get_column(id))[0]}{i+1}"
+    for i in range(len(all_values)):
+        if all_values[i][5] == "Рабочие":
+            k = i+1
+            for installer in lines[-1].split(','):
+                worksheet.update(f"{column}{k}", [[installer]])
 
 async def fill_value(link, location, value):
     spreadsheet = client.open_by_key(link.split('/')[5])

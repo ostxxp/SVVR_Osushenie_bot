@@ -175,7 +175,7 @@ async def installer_selection(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data.startswith("submit_"))
 async def submit(callback: CallbackQuery, state: FSMContext):
     with open(f'../report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
-        file.write(f"Монтажники {', '.join((await database_funcs.get_installers(callback.from_user.id)).split(','))[:-1]}")
+        file.write(f"Монтажники {(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
     await callback.message.edit_text("Загружаю данные в таблицу...")
     await report_table.create_table_report(callback.from_user.id)
     day, month, year = map(int, callback.data.split('_')[1].split('.'))
