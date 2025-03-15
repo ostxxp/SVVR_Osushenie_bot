@@ -6,6 +6,10 @@ import textwrap
 from DB import objects_fetching, groups_fetching, database_funcs
 from DB import installers_fetching
 
+yes_no_keyboard = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text="✅ Да", callback_data="yes")],
+                     [InlineKeyboardButton(text="❌ Нет", callback_data="submit_no")]]
+)
 
 async def objects_to_keyboard(id):
     buttons = []

@@ -5,6 +5,7 @@ import os
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from google.auth import message
 
 import inline_calendar
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -29,7 +30,8 @@ async def select_object(callback: CallbackQuery, state: FSMContext):
     month = datetime.today().month
     year = datetime.today().year
     obj_name = callback.data.split('_', 2)[2]
-    await database_funcs.add_report(id=callback.from_user.id, object_name=obj_name, prorab_name=await prorabs_fetching.get_prorab_name(callback.from_user.id))
+    await database_funcs.add_report(id=callback.from_user.id, object_name=obj_name,
+                                    prorab_name=await prorabs_fetching.get_prorab_name(callback.from_user.id))
     await callback.message.edit_text(f"Выберите дату для объекта\n*{obj_name}*",
                                      parse_mode='Markdown',
                                      reply_markup=await inline_calendar.create_calendar(month, year, state))
@@ -71,7 +73,6 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     state_data = await state.get_data()
     month, year = state_data.get('month', datetime.today().month), state_data.get('year', datetime.today().year)
     day = int(callback.data.split("_")[1])
-    keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, True, 0)
     date = f"{day}.{month}.{year}"
     with open(f'../report_info/{callback.from_user.id}.txt', 'w', encoding='utf-8') as file:
         file.write(date + '\n')
@@ -79,10 +80,18 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     obj = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
     link = obj[3]
     await report_table.find_date(callback.from_user.id, link, date)
+    await callback.message.edit_text(f"Проводились ли работы *{day} {months_selected[month]} {year}*?",
+                                     reply_markup=keyboards.yes_no_keyboard)
+
+@router.callback_query(F.data == "yes")
+async def yes(callback: CallbackQuery):
+    keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, True, 0)
+    day, month, year = map(int, (await database_funcs.get_report_date(callback.from_user.id)).split('.'))
     await callback.message.edit_text(
         f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, когда заполните все работы, нажмите\n*👨🏻‍🔧 Выбрать рабочих*",
         parse_mode='Markdown', reply_markup=keyboard)
+
 
 
 @router.callback_query(F.data.startswith("back_to_day_"))
@@ -165,14 +174,18 @@ async def installer_selection(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("submit_"))
 async def submit(callback: CallbackQuery):
-    with open(f'../report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
-        file.write(f"Монтажники {(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
-    await callback.message.edit_text("Загружаю данные в таблицу...")
-    await report_table.create_table_report(callback.from_user.id)
-    day, month, year = map(int, callback.data.split('_')[1].split('.'))
-    await callback.message.edit_text(f"✅ Дневной отчет за *{day} {months_selected[month]} {year}* заполнен!"
-                                     f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
-                                     parse_mode='Markdown')
+    if callback.data.split('_')[1] == 'no':
+        day, month, year = map(int, (await database_funcs.get_report_date(callback.from_user.id)).split('.'))
+        await report_table.fill_zeros(callback.from_user.id)
+    else:
+        with open(f'../report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
+            file.write(f"Монтажники {(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
+        await callback.message.edit_text("Загружаю данные в таблицу...")
+        await report_table.create_table_report(callback.from_user.id)
+        day, month, year = map(int, callback.data.split('_')[1].split('.'))
+        await callback.message.edit_text(f"✅ Дневной отчет за *{day} {months_selected[month]} {year}* заполнен!"
+                                         f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
+                                         parse_mode='Markdown')
     if day == datetime.today().day and month == datetime.today().month and year == datetime.today().year:
         await database_funcs.filled(callback.from_user.id, True)
     await database_funcs.clear_reports(callback.from_user.id)

@@ -1,17 +1,23 @@
 from DB.docs_fetching import client
 from DB.groups_fetching import sorted_groups
 from DB import database_funcs, objects_fetching
+from DB.objects_fetching import all_values
+
 
 async def create_table_report(id):
     object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(id))
     link = object[3]
+
     with open(f'../report_info/{id}.txt', 'r', encoding='utf-8') as file:
         lines = file.readlines()
+
     spreadsheet = client.open_by_key(link.split('/')[5])
     worksheet = spreadsheet.sheet1
     all_values = worksheet.get_all_values()
+
     column = await database_funcs.get_column(id)
     worksheet.update(f"{column}2", [[lines[0]]])
+
     for k in range(1, len(lines)-1):
         for i in range(len(all_values)):
             if str(lines[k].split()[0]) == (all_values[i][0]):
@@ -22,6 +28,25 @@ async def create_table_report(id):
             k = i+1
             for installer in lines[-1].split(','):
                 worksheet.update(f"{column}{k}", [[installer]])
+
+async def fill_zeros(id):
+    object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(id))
+    link = object[3]
+
+    spreadsheet = client.open_by_key(link.split('/')[5])
+    worksheet = spreadsheet.sheet1
+    all_values = worksheet.get_all_values()
+
+    column = await database_funcs.get_column(id)
+
+    with open(f'../report_info/{id}.txt', 'r', encoding='utf-8') as file:
+        date = file.readlines()
+
+    worksheet.update(f"{column}2", [[date]])
+
+    for i in range(2, len(all_values)):
+        if all_values[i][5] != "Рабочие" and all_values[i][0].count(".") > 0:
+            worksheet.update(f"{column}{i+1}", [['0']])
 
 async def fill_value(link, location, value):
     spreadsheet = client.open_by_key(link.split('/')[5])
