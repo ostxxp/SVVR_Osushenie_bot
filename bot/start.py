@@ -1,4 +1,6 @@
 from aiogram import Router
+import asyncio
+import reminder
 
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
@@ -18,6 +20,8 @@ async def start(message: Message, state: FSMContext):
     if keyboard is not None:
         await message.answer("Здравствуй! Выбери объект:", reply_markup=keyboard)
         if not await database_funcs.prorab_exists(message.from_user.id):
+            loop = asyncio.get_event_loop()
+            loop.create_task(reminder.send_reminders(message.from_user.id))
             await database_funcs.add_prorab(message.from_user.id)
     else:
         await message.answer("Похоже, что вы не прораб, либо вам не назначен ни один объект.")

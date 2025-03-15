@@ -42,11 +42,20 @@ async def groups_to_keyboard(id, is_general, iteration, group_number = None):
 async def installers_to_keyboard(id, filter=None):
     buttons = []
     if filter is None:
-        for installer in installers_fetching.installers[:5]:
-            inst = str(installer[1])
-            if (await database_funcs.get_installers(id) is not None) and installer[1] in (await database_funcs.get_installers(id)):
-                inst = "✅ " + inst
-            buttons.append([InlineKeyboardButton(text=inst, callback_data=f"installer_{installer[1]}")])
+        k = 0
+        for installer in installers_fetching.installers:
+            if k < 3:
+                inst = str(installer[1])
+                if (await database_funcs.get_installers(id) is not None) and installer[1] in (await database_funcs.get_installers(id)):
+                    inst = "✅ " + inst
+                buttons.append([InlineKeyboardButton(text=inst, callback_data=f"installer_{installer[1]}")])
+                k += 1
+            else:
+                inst = str(installer[1])
+                if (await database_funcs.get_installers(id) is not None) and installer[1] in (await database_funcs.get_installers(id)):
+                    inst = "✅ " + inst
+                    buttons.append([InlineKeyboardButton(text=inst, callback_data=f"installer_{installer[1]}")])
+
         buttons.append(
             [InlineKeyboardButton(text="...", callback_data=f"none")]
         )

@@ -187,7 +187,7 @@ async def fill_volume(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "installers")
 async def confirm(callback: CallbackQuery, state: FSMContext):
-    msg = await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:\n"
+    msg = await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:\n\n"
                                                 "_(Вы можете отфильтровать рабочих по фамилии. Для этого просто "
                                                 "напишите желаемое начало фамилии работника)_",
                                            reply_markup=await keyboards.installers_to_keyboard(callback.from_user.id),
@@ -217,8 +217,11 @@ async def installer_selection(callback: CallbackQuery):
         await database_funcs.remove_installer(callback.from_user.id, installer)
     else:
         await database_funcs.add_installer(callback.from_user.id, installer)
-    await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:",
-                                     reply_markup=await keyboards.installers_to_keyboard(callback.from_user.id))
+    msg = await callback.message.edit_text(text="Выберите монтажников, которые присутствовали на объекте:\n\n"
+                                                "_(Вы можете отфильтровать рабочих по фамилии. Для этого просто "
+                                                "напишите желаемое начало фамилии работника)_",
+                                           reply_markup=await keyboards.installers_to_keyboard(callback.from_user.id),
+                                           parse_mode='Markdown')
 
 
 @router.callback_query(F.data.startswith("submit_"))
