@@ -5,7 +5,7 @@ import os
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-import inline_calendar
+from bot import inline_calendar
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from DB import report_table
@@ -16,7 +16,7 @@ from DB import groups_fetching, objects_fetching, prorabs_fetching
 
 from states import States
 
-import keyboards
+from bot import keyboards
 from datetime import datetime
 from DB import database_funcs
 
