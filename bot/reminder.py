@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
 
-from bot_init import bot
+from bot.bot_init import bot
 from DB import database_funcs
 
 
