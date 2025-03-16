@@ -20,7 +20,7 @@ async def fetch_objects_names(id):
     objects = []
     for d in data:
         try:
-            if d[2] == name:
+            if name in d[2]:
                 objects.append(d[1])
         except:
             pass

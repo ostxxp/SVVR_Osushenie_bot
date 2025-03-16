@@ -230,8 +230,6 @@ async def submit(callback: CallbackQuery):
 
     if callback.data.split('_')[1] == 'no':
         day, month, year = map(int, (await database_funcs.get_report_date(callback.from_user.id)).split('.'))
-
-        await report_table.fill_zeros(callback.from_user.id)
     else:
         with open(f'../report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
             file.write(f"{(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
