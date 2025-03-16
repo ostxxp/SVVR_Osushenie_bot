@@ -14,7 +14,7 @@ from bot.months import months_selected
 
 from DB import groups_fetching, objects_fetching, prorabs_fetching
 
-from states import States
+from bot.states import States
 
 from bot import keyboards
 from datetime import datetime
