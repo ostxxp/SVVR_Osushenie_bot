@@ -6,7 +6,7 @@ async def create_table_report(id):
     object = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(id))
     link = object[3]
 
-    with open(f'../report_info/{id}.txt', 'r', encoding='utf-8') as file:
+    with open(f'report_info/{id}.txt', 'r', encoding='utf-8') as file:
         lines = file.readlines()
 
     spreadsheet = client.open_by_key(link.split('/')[5])
@@ -40,7 +40,7 @@ async def fill_zeros(id):
 
     column = await database_funcs.get_column(id)
 
-    with open(f'../report_info/{id}.txt', 'r', encoding='utf-8') as file:
+    with open(f'report_info/{id}.txt', 'r', encoding='utf-8') as file:
         date = file.readlines()
     worksheet.update(f"{column}2", [[date[0].strip()]])
 

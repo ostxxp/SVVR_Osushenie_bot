@@ -86,7 +86,7 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
 
     date = f"{day}.{str_month}.{year}"
 
-    with open(f'../report_info/{callback.from_user.id}.txt', 'w', encoding='utf-8') as file:
+    with open(f'report_info/{callback.from_user.id}.txt', 'w', encoding='utf-8') as file:
         file.write(date + '\n')
 
     await database_funcs.add_date(callback.from_user.id, date)
@@ -174,7 +174,7 @@ async def fill_volume(message: Message, state: FSMContext):
                 await msg.edit_text(
                     text=f"Объем: {message.text} ({data.get('quantity')}) Верно?\nЕсли нет, напишите значение ещё раз",
                     reply_markup=keyboard)
-                with open(f"../report_info/{message.from_user.id}.txt", 'a', encoding='utf-8') as file:
+                with open(f"report_info/{message.from_user.id}.txt", 'a', encoding='utf-8') as file:
                     file.write(f'{data.get('group')} {message.text}\n')
             except Exception as e:
                 print(e)
@@ -231,7 +231,7 @@ async def submit(callback: CallbackQuery):
     if callback.data.split('_')[1] == 'no':
         day, month, year = map(int, (await database_funcs.get_report_date(callback.from_user.id)).split('.'))
     else:
-        with open(f'../report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
+        with open(f'report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
             file.write(f"{(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
 
         await report_table.create_table_report(callback.from_user.id)
@@ -247,6 +247,6 @@ async def submit(callback: CallbackQuery):
     await database_funcs.clear_reports(callback.from_user.id)
 
     try:
-        os.remove(f"../report_info/{callback.from_user.id}.txt")
+        os.remove(f"report_info/{callback.from_user.id}.txt")
     except FileNotFoundError:
-        print(f"The file ../report_info/{callback.from_user.id}.txt was not found")
+        print(f"The file report_info/{callback.from_user.id}.txt was not found")
