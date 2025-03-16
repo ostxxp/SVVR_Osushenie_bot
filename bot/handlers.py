@@ -10,7 +10,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from DB import report_table
 
-from months import months_selected
+from bot.months import months_selected
 
 from DB import groups_fetching, objects_fetching, prorabs_fetching
 

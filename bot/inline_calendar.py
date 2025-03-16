@@ -2,7 +2,7 @@ import calendar
 from aiogram import Router
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.fsm.context import FSMContext
-from months import months
+from bot.months import months
 
 router = Router()
 
