@@ -9,11 +9,11 @@ prorabs = all_values[1:]
 
 async def is_prorab(id):
     for prorab in prorabs:
-        if int(prorab[0]) == id:
+        if prorab[0] != '' and int(prorab[0]) == id:
             return True
     return False
 
 async def get_prorab_name(id):
     for prorab in prorabs:
-        if int(prorab[0]) == id:
+        if prorab[0] != '' and int(prorab[0]) == id:
             return prorab[1]

@@ -12,7 +12,7 @@ data = all_values[4:]
 
 async def fetch_objects_names(id):
     for prorab in prorabs:
-        if int(prorab[0]) == id:
+        if prorab[0] != '' and int(prorab[0]) == id:
             name = prorab[1]
             break
     else:
