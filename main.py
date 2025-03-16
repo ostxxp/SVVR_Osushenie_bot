@@ -3,7 +3,7 @@ import asyncio
 
 from bot import start, handlers
 from bot import inline_calendar
-from bot.__init__ import dp, bot
+from bot.bot_init import dp, bot
 from bot import reminder
 from DB import database_funcs
 
