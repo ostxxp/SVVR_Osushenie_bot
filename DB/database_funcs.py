@@ -9,7 +9,6 @@ async def object_filled(id, obj_name):
     prorab = db.query(Prorab).filter_by(id=id).first()
     if prorab:
         objects = prorab.objects_left
-        print(objects)
         if objects is None:
             await filled(id, True)
         else:
