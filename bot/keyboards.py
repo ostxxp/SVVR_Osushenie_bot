@@ -8,6 +8,7 @@ yes_no_keyboard = InlineKeyboardMarkup(
                       InlineKeyboardButton(text="❌ Нет", callback_data="submit_no")]]
 )
 
+
 async def objects_to_keyboard(id):
     buttons = []
     if (await objects_fetching.fetch_objects_names(id)) is not None:
@@ -46,6 +47,7 @@ async def groups_to_keyboard(id, is_general, iteration, group_number = None):
         buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=num)])
     else:
         buttons.append([InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_day_{await database_funcs.get_report_date(id)}")])
+    buttons.append([InlineKeyboardButton(text="🙅🏻‍♂️ Отменить заполнение", callback_data="abort")])
     groups = InlineKeyboardMarkup(inline_keyboard=buttons)
     return groups
 
@@ -79,5 +81,6 @@ async def installers_to_keyboard(id, filter=None):
     buttons.append(
         [InlineKeyboardButton(text="🔙 Назад", callback_data=f"back_to_day_{await database_funcs.get_report_date(id)}")])
     buttons.append([InlineKeyboardButton(text="Отправить📨", callback_data=f"submit_{await database_funcs.get_report_date(id)}")])
+    buttons.append([InlineKeyboardButton(text="🙅🏻‍♂️ Отменить заполнение", callback_data="abort")])
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard

@@ -251,3 +251,12 @@ async def submit(callback: CallbackQuery):
         os.remove(f"report_info/{callback.from_user.id}.txt")
     except FileNotFoundError:
         print(f"The file report_info/{callback.from_user.id}.txt was not found")
+
+@router.callback_query(F.data == "abort")
+async def abort(callback: CallbackQuery):
+    await database_funcs.clear_reports(callback.from_user.id)
+    try:
+        os.remove(f"report_info/{callback.from_user.id}.txt")
+    except FileNotFoundError:
+        print(f"The file report_info/{callback.from_user.id}.txt was not found")
+    await callback.message.edit_text("❌ Заполнение прервано, чтобы заполнить новый отчет, нажмите /start")
