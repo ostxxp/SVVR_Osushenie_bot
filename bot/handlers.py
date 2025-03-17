@@ -131,7 +131,7 @@ async def subgroups(callback: CallbackQuery, state: FSMContext):
     keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, False, callback.data.count('.') + 1,
                                                   callback.data)
 
-    if len(keyboard.inline_keyboard) == 1:
+    if len(keyboard.inline_keyboard) == 2:
         back = InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text="🔙 Назад", callback_data='.'.join(callback.data.split('.')[:-1]))]]
