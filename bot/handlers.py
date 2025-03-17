@@ -243,6 +243,7 @@ async def submit(callback: CallbackQuery):
 
     if day == datetime.today().day and month == datetime.today().month and year == datetime.today().year:
         object_name = await database_funcs.get_obj_name(callback.from_user.id)
+        print(object_name)
         await database_funcs.object_filled(callback.from_user.id, object_name)
 
     await database_funcs.clear_reports(callback.from_user.id)
