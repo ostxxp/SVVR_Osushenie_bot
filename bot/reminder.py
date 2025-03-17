@@ -2,13 +2,20 @@ import asyncio
 from datetime import datetime, timedelta
 
 from bot.bot_init import bot
-from DB import database_funcs, objects_fetching
+from DB import database_funcs, objects_fetching, prorabs_fetching
 
 from bot import keyboards
 
 
 async def send_reminders(id):
     while True:
+        still_working = False
+        for prorab in await prorabs_fetching.get_prorabs():
+            if prorab[0] == id:
+                still_working = True
+        if not still_working:
+            await database_funcs.remove_prorab(id)
+            break
         now = datetime.now()
         if now.hour >= 20:
             if now.minute % 15 == 0:

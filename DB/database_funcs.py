@@ -55,7 +55,13 @@ async def filled(id, flag):
 async def get_prorabs():
     return db.query(Prorab).all()
 
-# REPORTS
+async def remove_prorab(id):
+    prorab = db.query(Prorab).filter_by(id=id).first()
+    if prorab:
+        db.delete(prorab)
+        db.commit()
+
+    # REPORTS
 async def report_exists(id, date):
     return db.query(Report).filter_by(prorab_id=id, date=date).first() is not None
 
