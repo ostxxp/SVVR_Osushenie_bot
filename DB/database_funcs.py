@@ -5,6 +5,29 @@ from DB.base_models import Prorab, Report
 async def prorab_exists(id):
     return db.query(Prorab).filter_by(id=id).first() is not None
 
+async def object_filled(id, obj_name):
+    prorab = db.query(Prorab).filter_by(id=id).first()
+    if prorab:
+        objects = prorab.objects_left
+        if objects is None:
+            await filled(id, True)
+        else:
+            objects = objects.replace(f"{obj_name}|", "")
+            if len(objects) == 0:
+                await filled(id, True)
+        db.commit()
+        db.close()
+
+async def set_objects(id, objects):
+    prorab = db.query(Prorab).filter_by(id=id).first()
+    if prorab:
+        prorab.objects_left = objects
+        db.commit()
+        db.close()
+
+async def get_unfilled_objects(id):
+    return db.query(Prorab).filter_by(id=id).first().objects_left
+
 
 async def add_prorab(id):
     new_prorab = Prorab(id=id, is_filled=0)

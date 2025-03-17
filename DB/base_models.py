@@ -7,6 +7,7 @@ class Prorab(Base):
     __tablename__ = 'prorabs'
     id = Column(Integer, primary_key=True)
     is_filled = Column(Integer)
+    objects_left = Column(String)
 
 
 class Report(Base):
