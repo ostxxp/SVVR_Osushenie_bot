@@ -9,10 +9,11 @@ async def object_filled(id, obj_name):
     prorab = db.query(Prorab).filter_by(id=id).first()
     if prorab:
         objects = prorab.objects_left
+        print(objects)
         if objects is None:
             await filled(id, True)
         else:
-            objects = objects.replace(f"{obj_name}|", "")
+            prorab.objects_left = objects.replace(f"{obj_name}|", "")
             if len(objects) == 0:
                 await filled(id, True)
         db.commit()
