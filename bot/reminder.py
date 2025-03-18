@@ -11,8 +11,9 @@ async def send_reminders(id):
     while True:
         still_working = False
         for prorab in await prorabs_fetching.get_prorabs():
-            if prorab[0] == id:
+            if prorab[0] == str(id):
                 still_working = True
+                break
         if not still_working:
             await database_funcs.remove_prorab(id)
             break
