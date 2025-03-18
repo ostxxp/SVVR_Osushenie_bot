@@ -29,6 +29,7 @@ async def send_reminders(id):
                 else:
                     target_time = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
                     secs = (target_time - now).total_seconds()
+                    print(str(secs) + "a")
                     await asyncio.sleep(secs)
                     await database_funcs.set_objects(id, await objects_fetching.fetch_objects_names(id))
                     await database_funcs.filled(id, False)
@@ -42,7 +43,7 @@ async def send_reminders(id):
                     target_time = now.replace(hour=now.hour, minute=15 * (now.minute // 15 + 1), second=0,
                                               microsecond=0)
                 secs = (target_time - now).total_seconds()
-                print(secs)
+                print(str(secs) + "b")
                 await asyncio.sleep(secs)
         else:
             now = datetime.now()
@@ -51,4 +52,5 @@ async def send_reminders(id):
                 target_time += timedelta(days=1)
 
             secs = (target_time - now).total_seconds()
+            print(str(secs) + "c")
             await asyncio.sleep(secs)
