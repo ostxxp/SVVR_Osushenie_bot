@@ -42,6 +42,7 @@ async def send_reminders(id):
                     target_time = now.replace(hour=now.hour, minute=15 * (now.minute // 15 + 1), second=0,
                                               microsecond=0)
                 secs = (target_time - now).total_seconds()
+                print(secs)
                 await asyncio.sleep(secs)
         else:
             now = datetime.now()
