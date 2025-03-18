@@ -52,5 +52,5 @@ async def send_reminders(id):
                 target_time += timedelta(days=1)
 
             secs = (target_time - now).total_seconds()
-            print(str(secs) + "c")
+            print(str(secs) + "c", now.hour)
             await asyncio.sleep(secs)
