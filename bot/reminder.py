@@ -18,7 +18,8 @@ async def send_reminders(id):
             await database_funcs.remove_prorab(id)
             break
         now = datetime.now()
-        if now.hour >= 20:
+        hour = now.hour + 3
+        if hour >= 20:
             if now.minute % 15 == 0:
                 if not await database_funcs.is_filled(id):
                     unfilled_objects = await database_funcs.get_unfilled_objects(id)
@@ -27,7 +28,7 @@ async def send_reminders(id):
                                            reply_markup=keyboards.objects_to_keyboard_by_names(id, unfilled_objects))
                     await asyncio.sleep(900)
                 else:
-                    target_time = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+                    target_time = now.replace(hour=21, minute=0, second=0, microsecond=0) + timedelta(days=1)
                     secs = (target_time - now).total_seconds()
                     print(str(secs) + "a")
                     await asyncio.sleep(secs)
@@ -35,22 +36,20 @@ async def send_reminders(id):
                     await database_funcs.filled(id, False)
             else:
                 if now.minute > 45:
-                    if now.hour == 23:
-                        target_time = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+                    if hour == 23:
+                        target_time = now.replace(hour=21, minute=0, second=0, microsecond=0)
                     else:
                         target_time = now.replace(hour=now.hour + 1, minute=0, second=0, microsecond=0)
                 else:
                     target_time = now.replace(hour=now.hour, minute=15 * (now.minute // 15 + 1), second=0,
                                               microsecond=0)
                 secs = (target_time - now).total_seconds()
-                print(str(secs) + "b")
                 await asyncio.sleep(secs)
         else:
             now = datetime.now()
-            target_time = now.replace(hour=20, minute=0, second=0, microsecond=0)
+            target_time = now.replace(hour=17, minute=0, second=0, microsecond=0)
             if now > target_time:
                 target_time += timedelta(days=1)
 
             secs = (target_time - now).total_seconds()
-            print(str(secs) + "c", now.hour)
             await asyncio.sleep(secs)
