@@ -26,7 +26,7 @@ async def set_objects(id, objects):
         db.close()
 
 async def get_unfilled_objects(id):
-    return db.query(Prorab).filter_by(id=id).first().objects_left
+    return db.query(Prorab).filter_by(id=id).first().objects_left[:-1].split('|')
 
 
 async def add_prorab(id):

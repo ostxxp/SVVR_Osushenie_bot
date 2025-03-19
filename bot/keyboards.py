@@ -20,13 +20,10 @@ async def objects_to_keyboard(id):
 
 async def objects_to_keyboard_by_names(id, obj_names):
     buttons = []
-    if (await objects_fetching.fetch_objects_names(id)) is not None:
-        for obj in (await objects_fetching.fetch_objects_names(id)):
-            if obj in obj_names:
-                buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
-        keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
-        return keyboard
-    return None
+    for obj in obj_names:
+        buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
 
 async def groups_to_keyboard(id, is_general, iteration, group_number = None):
     buttons = []
