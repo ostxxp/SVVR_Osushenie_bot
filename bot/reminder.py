@@ -43,7 +43,9 @@ async def send_reminders(id):
                 secs = (target_time - now).total_seconds()
                 await asyncio.sleep(secs)
         else:
-            await database_funcs.set_objects(id, await objects_fetching.fetch_objects_names(id))
+            objs = await objects_fetching.fetch_objects_names(id)
+            objs.append("")
+            await database_funcs.set_objects(id, "|".join(objs))
             await database_funcs.filled(id, False)
             now = datetime.now()
             target_time = now.replace(hour=17, minute=0, second=0, microsecond=0)
