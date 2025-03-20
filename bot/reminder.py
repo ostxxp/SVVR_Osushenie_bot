@@ -19,8 +19,8 @@ async def send_reminders(id):
             break
         now = datetime.now()
         hour = now.hour + 3
-        if hour >= 12:
-            if now.minute % 15 == 0 or now.minute % 15 != 0:
+        if hour >= 20:
+            if now.minute % 15 == 0:
                 if not await database_funcs.is_filled(id):
                     unfilled_objects = await database_funcs.get_unfilled_objects(id)
                     await bot.send_message(chat_id=id,
