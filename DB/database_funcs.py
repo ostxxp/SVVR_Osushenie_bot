@@ -13,7 +13,7 @@ async def object_filled(id, obj_name):
             await filled(id, True)
         else:
             prorab.objects_left = objects.replace(f"{obj_name}|", "")
-            if len(objects) == 0:
+            if prorab.objects_left.count('|') == 0:
                 await filled(id, True)
         db.commit()
         db.close()

@@ -18,8 +18,8 @@ async def send_reminders(id):
             await database_funcs.remove_prorab(id)
             break
         now = datetime.now()
-        hour = now.hour + 3
-        if 20 <= hour <= 24:
+        hour = (now.hour + 3) % 24
+        if hour >= 20:
             if now.minute % 15 == 0:
                 if not await database_funcs.is_filled(id):
                     unfilled_objects = await database_funcs.get_unfilled_objects(id)
@@ -31,8 +31,6 @@ async def send_reminders(id):
                     target_time = now.replace(hour=21, minute=0, second=0, microsecond=0) + timedelta(days=1)
                     secs = (target_time - now).total_seconds()
                     await asyncio.sleep(secs)
-                    await database_funcs.set_objects(id, await objects_fetching.fetch_objects_names(id))
-                    await database_funcs.filled(id, False)
             else:
                 if now.minute > 45:
                     if hour == 23:
@@ -45,6 +43,8 @@ async def send_reminders(id):
                 secs = (target_time - now).total_seconds()
                 await asyncio.sleep(secs)
         else:
+            await database_funcs.set_objects(id, await objects_fetching.fetch_objects_names(id))
+            await database_funcs.filled(id, False)
             now = datetime.now()
             target_time = now.replace(hour=17, minute=0, second=0, microsecond=0)
             if now > target_time:
