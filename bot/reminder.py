@@ -19,18 +19,18 @@ async def send_reminders(id):
             break
         now = datetime.now()
         hour = now.hour + 3
-        if hour >= 20:
-            if now.minute % 15 == 0:
+        if hour >= 12:
+            if now.minute % 15 == 0 or now.minute % 15 != 0:
                 if not await database_funcs.is_filled(id):
                     unfilled_objects = await database_funcs.get_unfilled_objects(id)
-                    await bot.send_message(chat_id=id,
-                                           text="‼️ Пожалуйста, заполните дневной отчет по объектам ‼️",
-                                           reply_markup=keyboards.objects_to_keyboard_by_names(id, unfilled_objects))
+                    print(keyboards.objects_to_keyboard_by_names(id, unfilled_objects))
+                    # await bot.send_message(chat_id=id,
+                    #                        text="‼️ Пожалуйста, заполните дневной отчет по объектам ‼️",
+                    #                        reply_markup=keyboards.objects_to_keyboard_by_names(id, unfilled_objects))
                     await asyncio.sleep(900)
                 else:
                     target_time = now.replace(hour=21, minute=0, second=0, microsecond=0) + timedelta(days=1)
                     secs = (target_time - now).total_seconds()
-                    print(str(secs) + "a")
                     await asyncio.sleep(secs)
                     await database_funcs.set_objects(id, await objects_fetching.fetch_objects_names(id))
                     await database_funcs.filled(id, False)
