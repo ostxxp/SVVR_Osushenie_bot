@@ -163,21 +163,15 @@ async def fill_volume(message: Message, state: FSMContext):
         ]
     )
     try:
-        if '.' in message.text:
-            await msg.edit_text("Если вы хотите ввести десятичное число, введите его в формате x,y")
-        else:
-            if ',' in message.text:
-                a = float(message.text.replace(',', '.'))
-            else:
-                a = int(message.text)
-            try:
-                await msg.edit_text(
-                    text=f"Объем: {message.text} ({data.get('quantity')}) Верно?\nЕсли нет, напишите значение ещё раз",
-                    reply_markup=keyboard)
-                with open(f"report_info/{message.from_user.id}.txt", 'a', encoding='utf-8') as file:
-                    file.write(f'{data.get('group')} {message.text}\n')
-            except Exception as e:
-                print(e)
+        a = float(message.text.replace(',', '.'))
+        try:
+            await msg.edit_text(
+                text=f"Объем: {message.text} ({data.get('quantity')}) Верно?\nЕсли нет, напишите значение ещё раз",
+                reply_markup=keyboard)
+            with open(f"report_info/{message.from_user.id}.txt", 'a', encoding='utf-8') as file:
+                file.write(f'{data.get('group')} {message.text.replace(',', '.')}\n')
+        except Exception as e:
+            print(e)
     except:
         try:
             await msg.edit_text(text=f"Нужно указать только число. Попробуйте ещё раз")

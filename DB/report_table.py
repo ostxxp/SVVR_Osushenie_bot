@@ -19,7 +19,7 @@ async def create_table_report(id):
     for k in range(1, len(lines) - 1):
         for i in range(len(all_values)):
             if str(lines[k].split()[0]) == (all_values[i][0]):
-                worksheet.update(f"{column}{i + 1}", [[lines[k].split()[1].strip()]])
+                worksheet.update(f"{column}{i + 1}", [[float(lines[k].split()[1].strip())]])
                 break
 
     for i in range(len(all_values)):
