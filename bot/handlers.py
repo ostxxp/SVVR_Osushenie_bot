@@ -221,15 +221,12 @@ async def installer_selection(callback: CallbackQuery):
 @router.callback_query(F.data.startswith("submit_"))
 async def submit(callback: CallbackQuery):
     await callback.message.edit_text("Загружаю данные в таблицу...")
-
-    if callback.data.split('_')[1] == 'no':
-        day, month, year = map(int, (await database_funcs.get_report_date(callback.from_user.id)).split('.'))
-    else:
+    day, month, year = map(int, (await database_funcs.get_report_date(callback.from_user.id)).split('.'))
+    if callback.data.split('_')[1] != 'no':
         with open(f'report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
             file.write(f"{(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
 
-        await report_table.create_table_report(callback.from_user.id)
-        day, month, year = map(int, callback.data.split('_')[1].split('.'))
+    await report_table.create_table_report(callback.from_user.id)
 
     await callback.message.edit_text(f"✅ Дневной отчет за *{day} {months_selected[month]} {year}* заполнен!"
                                      f"\nЧтобы заполнить ещё один отчет, напишите команду /start",

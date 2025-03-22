@@ -21,13 +21,13 @@ async def create_table_report(id):
             if str(lines[k].split()[0]) == (all_values[i][0]):
                 worksheet.update(f"{column}{i + 1}", [[float(lines[k].split()[1].strip())]])
                 break
-
-    for i in range(len(all_values)):
-        if all_values[i][5] == "Рабочие":
-            k = i + 1
-            for installer in sorted(lines[-1].split(',')):
-                worksheet.update(f"{column}{k}", [[installer]])
-                k += 1
+    if lines[-1].count(',') != 0 or lines[-1].count('.') != 3:
+        for i in range(len(all_values)):
+            if all_values[i][5] == "Рабочие":
+                k = i + 1
+                for installer in sorted(lines[-1].split(',')):
+                    worksheet.update(f"{column}{k}", [[installer]])
+                    k += 1
 
 
 async def fill_zeros(id):
