@@ -14,7 +14,6 @@ async def create_table_report(id):
 
     column = await database_funcs.get_column(id)
     worksheet.update(f"{column}2", [[lines[0]]])
-    print(lines)
     if len(lines) > 1:
         for k in range(1, len(lines) - 1):
             for i in range(len(all_values)):
