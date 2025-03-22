@@ -8,20 +8,18 @@ async def create_table_report(id):
 
     with open(f'report_info/{id}.txt', 'r', encoding='utf-8') as file:
         lines = file.readlines()
-
     spreadsheet = client.open_by_key(link.split('/')[5])
     worksheet = spreadsheet.sheet1
     all_values = worksheet.get_all_values()
 
     column = await database_funcs.get_column(id)
     worksheet.update(f"{column}2", [[lines[0]]])
-
-    for k in range(1, len(lines) - 1):
-        for i in range(len(all_values)):
-            if str(lines[k].split()[0]) == (all_values[i][0]):
-                worksheet.update(f"{column}{i + 1}", [[float(lines[k].split()[1].strip())]])
-                break
-    if lines[-1].count(',') != 0 or lines[-1].count('.') != 3:
+    if len(lines) > 1:
+        for k in range(1, len(lines) - 1):
+            for i in range(len(all_values)):
+                if str(lines[k].split()[0]) == (all_values[i][0]):
+                    worksheet.update(f"{column}{i + 1}", [[float(lines[k].split()[1].strip())]])
+                    break
         for i in range(len(all_values)):
             if all_values[i][5] == "Рабочие":
                 k = i + 1
