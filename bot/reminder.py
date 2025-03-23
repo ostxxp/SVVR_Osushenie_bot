@@ -17,7 +17,7 @@ async def send_reminders(id):
         if not still_working:
             await database_funcs.remove_prorab(id)
             break
-        if not database_funcs.prorab_exists(id):
+        if not await database_funcs.prorab_exists(id):
             break
         now = datetime.now()
         hour = (now.hour + 3) % 24
