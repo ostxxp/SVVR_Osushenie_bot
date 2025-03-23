@@ -17,6 +17,8 @@ async def send_reminders(id):
         if not still_working:
             await database_funcs.remove_prorab(id)
             break
+        if not database_funcs.prorab_exists(id):
+            break
         now = datetime.now()
         hour = (now.hour + 3) % 24
         if hour >= 20:
@@ -28,7 +30,7 @@ async def send_reminders(id):
                                            reply_markup=await keyboards.objects_to_keyboard_by_names(id, unfilled_objects))
                     await asyncio.sleep(900)
                 else:
-                    target_time = now.replace(hour=21, minute=0, second=0, microsecond=0) + timedelta(days=1)
+                    target_time = now.replace(hour=21, minute=0, second=0, microsecond=0)
                     secs = (target_time - now).total_seconds()
                     await asyncio.sleep(secs)
             else:
