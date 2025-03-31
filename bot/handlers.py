@@ -73,6 +73,8 @@ async def next_month(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data.startswith("day_"))
 async def select_day(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(f"Секунду...",
+                                     parse_mode='Markdown')
     state_data = await state.get_data()
 
     month, year = state_data.get('month', datetime.today().month), state_data.get('year', datetime.today().year)
