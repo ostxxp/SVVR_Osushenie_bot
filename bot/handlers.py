@@ -53,7 +53,7 @@ async def prev_month(callback: CallbackQuery, state: FSMContext):
         month = 12
         year -= 1
 
-    await callback.message.edit_text("Выберите день:",
+    await callback.message.edit_text("Выбрите день:",
                                      reply_markup=await inline_calendar.create_calendar(month, year, state))
 
 
