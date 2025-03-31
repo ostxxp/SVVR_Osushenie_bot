@@ -47,5 +47,8 @@ async def find_date(id, link, date):
     spreadsheet = client.open_by_key(link.split('/')[5])
     worksheet = spreadsheet.sheet1
     values = worksheet.row_values(2)
+    for dates in values:
+        if date == dates.strip():
+            return "exists"
     await database_funcs.set_column(id, str(len(values) + 1))
     return None

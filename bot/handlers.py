@@ -94,9 +94,17 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     obj = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
     link = obj[3]
 
-    await report_table.find_date(callback.from_user.id, link, date)
-
-    await callback.message.edit_text(f"Проводились ли работы *{day} {months_selected[month]} {year}*?",
+    if await report_table.find_date(callback.from_user.id, link, date) == "exists":
+        await callback.message.edit_text(f"👨🏻‍🔧 Дневной отчет за *{day} {months_selected[month]} {year}* уже был заполнен!"
+                                         f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
+                                         parse_mode='Markdown')
+        try:
+            await database_funcs.clear_reports(callback.from_user.id)
+            os.remove(f"report_info/{callback.from_user.id}.txt")
+        except FileNotFoundError:
+            print(f"The file report_info/{callback.from_user.id}.txt was not found")
+    else:
+            await callback.message.edit_text(f"Проводились ли работы *{day} {months_selected[month]} {year}*?",
                                      reply_markup=keyboards.yes_no_keyboard, parse_mode='Markdown')
 
 
