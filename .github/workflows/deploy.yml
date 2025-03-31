@@ -17,6 +17,8 @@ jobs:
         run: |
           echo "SSH_PRIVATE_KEY length: $(echo -n "$SSH_PRIVATE_KEY" | wc -c)"
           echo "First 10 chars: $(echo -n "$SSH_PRIVATE_KEY" | head -c 10)"
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 
       - name: Set up SSH
@@ -27,7 +29,8 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
           ssh -o StrictHostKeyChecking=no root@217.114.1.63 "echo 'SSH работает!'"
-
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Deploy to server
         run: |
           ssh root@217.114.1.63 << 'EOF'
