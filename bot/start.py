@@ -18,7 +18,7 @@ async def start(message: Message, state: FSMContext):
     await database_funcs.clear_reports(message.from_user.id)
     keyboard = await keyboards.objects_to_keyboard(message.from_user.id)
     if keyboard is not None:
-        await message.answer("Здравствуй! Выбери объект:", reply_markup=keyboard)
+        await message.answer("Здраввввввствуй! Выбери объект:", reply_markup=keyboard)
         if not await database_funcs.prorab_exists(message.from_user.id):
             await database_funcs.add_prorab(message.from_user.id)
             object_names = await objects_fetching.fetch_objects_names(message.from_user.id)
