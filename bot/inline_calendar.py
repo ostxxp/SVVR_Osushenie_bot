@@ -27,7 +27,7 @@ async def create_calendar(month, year, state: FSMContext):
                 row.append(InlineKeyboardButton(text=" ", callback_data="empty"))
             else:
                 if day == datetime.today().day and month == datetime.today().month and year == datetime.today().year:
-                    row.append(InlineKeyboardButton(text=f"⭐️{day}", callback_data=f"day_{day}"))
+                    row.append(InlineKeyboardButton(text=f"[{day}]", callback_data=f"day_{day}"))
                 else:
                     row.append(InlineKeyboardButton(text=f"{day}", callback_data=f"day_{day}"))
         keyboard.inline_keyboard.append(row)
