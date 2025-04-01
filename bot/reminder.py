@@ -9,6 +9,16 @@ from bot import keyboards
 
 async def send_reminders(id):
     while True:
+        keyboard = await keyboards.objects_to_keyboard(id)
+        if keyboard is None or len(keyboard.inline_keyboard) == 0:
+            now = datetime.now()
+            target_time = now.replace(hour=17, minute=0, second=0, microsecond=0)
+            if now > target_time:
+                target_time += timedelta(days=1)
+
+            secs = (target_time - now).total_seconds()
+            await asyncio.sleep(secs)
+            continue
         still_working = False
         for prorab in await prorabs_fetching.get_prorabs():
             if prorab[0] == str(id):
