@@ -66,6 +66,10 @@ async def report_exists(id, date):
     return db.query(Report).filter_by(prorab_id=id, date=date).first() is not None
 
 async def add_report(id, object_name, prorab_name):
+    report = db.query(Report).filter_by(prorab_id=id).first()
+    if report:
+        db.delete(report)
+        db.commit()
     new_report = Report(prorab_id=id, object_name=object_name, prorab_name=prorab_name)
     db.add(new_report)
     db.commit()

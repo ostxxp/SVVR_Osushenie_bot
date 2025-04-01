@@ -106,7 +106,7 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
         except FileNotFoundError:
             print(f"The file report_info/{callback.from_user.id}.txt was not found")
     else:
-            await callback.message.edit_text(f"Проводились ли работы *{day} {months_selected[month]} {year}*?",
+        await callback.message.edit_text(f"Проводились ли работы *{day} {months_selected[month]} {year}*?",
                                      reply_markup=keyboards.yes_no_keyboard, parse_mode='Markdown')
 
 
