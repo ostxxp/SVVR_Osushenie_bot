@@ -52,7 +52,7 @@ async def installers_to_keyboard(id, filter=None):
     buttons = []
     if filter is None:
         k = 0
-        for installer in installers_fetching.installers:
+        for installer in await installers_fetching.fetch_installers():
             if k < 3:
                 inst = str(installer[1])
                 if (await database_funcs.get_installers(id) is not None) and installer[1] in (await database_funcs.get_installers(id)):
@@ -69,7 +69,7 @@ async def installers_to_keyboard(id, filter=None):
             [InlineKeyboardButton(text="...", callback_data=f"none")]
         )
     else:
-        for installer in installers_fetching.installers:
+        for installer in await installers_fetching.fetch_installers():
             inst = str(installer[1])
             if inst.lower().startswith(filter):
                 if (await database_funcs.get_installers(id) is not None) and installer[1] in (await database_funcs.get_installers(id)):
