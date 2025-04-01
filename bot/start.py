@@ -17,8 +17,7 @@ router = Router()
 async def start(message: Message, state: FSMContext):
     await database_funcs.clear_reports(message.from_user.id)
     keyboard = await keyboards.objects_to_keyboard(message.from_user.id)
-    print(keyboard)
-    if keyboard is not None:
+    if keyboard is not None and len(keyboard.inline_keyboard) > 0:
         await message.answer("Здравствуй! Выбери объект:", reply_markup=keyboard)
         if not await database_funcs.prorab_exists(message.from_user.id):
             await database_funcs.add_prorab(message.from_user.id)
