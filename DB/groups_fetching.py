@@ -2,34 +2,29 @@ from DB.docs_fetching import client
 
 spreadsheet = client.open_by_key("1r6ByCgCV2SmeqdBwAxi1nVMJ8XJVJMv_drFAPShBB_w")
 
-worksheet = spreadsheet.sheet1
+worksheet = spreadsheet.get_worksheet(3)
 all_values = worksheet.get_all_values()
 
 groups = []
-for v in all_values[2:]:
-    if v[0] != '':
-        groups.append(v[0:3])
+for i in range(3, len(all_values[0])):
+    groups.append([all_values[0][i], all_values[1][i], all_values[2][i]])
 
-def sort_key(item):
-    return tuple(map(int, item[0].split('.')))
-
-sorted_groups = sorted(groups, key=sort_key)
 
 async def get_group_name(id):
     name = ""
-    for group in sorted_groups:
+    for group in groups:
         if group[0] == id:
             name += group[1].strip()
             break
     if id.count('.') == 2:
         target = '.'.join(id.split('.')[:-1])
-        for group in sorted_groups:
+        for group in groups:
             if group[0] == target:
                 name = group[1] + " *(" + name + ")*"
     return name
 
 async def get_work_type(id):
-    for group in sorted_groups:
+    for group in groups:
         if group[0] == id:
             return group[2]
 

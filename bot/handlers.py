@@ -95,7 +95,6 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
 
     obj = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
     link = obj[3]
-
     if await report_table.find_date(callback.from_user.id, link, date) == "exists":
         await callback.message.edit_text(f"👨🏻‍🔧 Дневной отчет за *{day} {months_selected[month]} {year}* уже был заполнен!"
                                          f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
