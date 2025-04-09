@@ -27,7 +27,7 @@ async def objects_to_keyboard_by_names(id, obj_names):
 
 async def groups_to_keyboard(id, is_general, iteration, group_number = None):
     buttons = []
-    groups = groups_fetching.sorted_groups
+    groups = groups_fetching.groups
     for group in groups:
         if group[0].count('.') == iteration:
             if group_number is None or group[0].startswith(f"{group_number}."):
