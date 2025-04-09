@@ -2,7 +2,7 @@ from DB.docs_fetching import client
 
 spreadsheet = client.open_by_key("1r6ByCgCV2SmeqdBwAxi1nVMJ8XJVJMv_drFAPShBB_w")
 
-worksheet = spreadsheet.get_worksheet(3)
+worksheet = spreadsheet.sheet1
 all_values = worksheet.get_all_values()
 
 groups = []

@@ -114,9 +114,11 @@ async def yes(callback: CallbackQuery):
     keyboard = await keyboards.groups_to_keyboard(callback.from_user.id, True, 0)
 
     day, month, year = map(int, (await database_funcs.get_report_date(callback.from_user.id)).split('.'))
-
+    str_day = str(day)
+    if len(str(day)) == 1:
+        str_day = '0' + str_day
     await callback.message.edit_text(
-        f"Вы выбрали: *{day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
+        f"Вы выбрали: *{str_day} {months_selected[month]} {year}*\n\nТеперь выберите группы работ, "
         f"которыми вы занимались, и, когда заполните все работы, нажмите\n*👨🏻‍🔧 Выбрать рабочих*",
         parse_mode='Markdown', reply_markup=keyboard)
 
@@ -236,8 +238,11 @@ async def submit(callback: CallbackQuery):
             file.write(f"{(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
 
     await report_table.create_table_report(callback.from_user.id)
+    str_day = str(day)
+    if len(str(day)) == 1:
+        str_day = '0' + str_day
 
-    await callback.message.edit_text(f"✅ Дневной отчет за *{day} {months_selected[month]} {year}* заполнен!"
+    await callback.message.edit_text(f"✅ Дневной отчет за *{str_day} {months_selected[month]} {year}* заполнен!"
                                      f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
                                      parse_mode='Markdown')
 
