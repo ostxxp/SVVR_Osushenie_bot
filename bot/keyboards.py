@@ -8,12 +8,20 @@ yes_no_keyboard = InlineKeyboardMarkup(
                       InlineKeyboardButton(text="❌ Нет", callback_data="submit_no")]]
 )
 
+yes_no_feedback_keyboard = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text="✅ Отправить", callback_data="feedback_yes"),
+                      InlineKeyboardButton(text="❌ Отмена", callback_data="abort")]]
+)
+
+feedback_button = [InlineKeyboardButton(text="Предложить улучшение 👍🏻", callback_data=f"feedback")]
+feedback_keyboard = InlineKeyboardMarkup(inline_keyboard=[feedback_button])
 
 async def objects_to_keyboard(id):
     buttons = []
     if (await objects_fetching.fetch_objects_names(id)) is not None:
         for obj in (await objects_fetching.fetch_objects_names(id)):
             buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
+        buttons.append(feedback_button)
         keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
         return keyboard
     return None
@@ -22,6 +30,7 @@ async def objects_to_keyboard_by_names(id, obj_names):
     buttons = []
     for obj in obj_names:
         buttons.append([InlineKeyboardButton(text=obj, callback_data=f"obj_{id}_{obj}")])
+    buttons.append(feedback_button)
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
 

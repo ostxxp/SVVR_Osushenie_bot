@@ -5,3 +5,4 @@ class States(StatesGroup):
     fill_volume = State()
     fill_installers = State()
     wait_for_filter = State()
+    wait_for_feedback = State()

@@ -1,24 +1,19 @@
+from datetime import datetime, timedelta
+
 from aiogram import Router, F
 from aiogram.filters import or_f, and_f
 import os
 
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.fsm.context import FSMContext
 
-from bot import inline_calendar
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-from DB import report_table
-
+from bot import inline_calendar, keyboards
 from bot.months import months_selected
-
-from DB import groups_fetching, objects_fetching, prorabs_fetching
-
 from bot.states import States
 
-from bot import keyboards
-from datetime import datetime
-from DB import database_funcs
+from bot.bot_init import bot
+
+from DB import groups_fetching, objects_fetching, prorabs_fetching, fill_feedback, database_funcs, report_table
 
 router = Router()
 
@@ -96,9 +91,10 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
     obj = await objects_fetching.fetch_objects_by_name(await database_funcs.get_obj_name(callback.from_user.id))
     link = obj[3]
     if await report_table.find_date(callback.from_user.id, link, date) == "exists":
-        await callback.message.edit_text(f"👨🏻‍🔧 Дневной отчет за *{day} {months_selected[month]} {year}* уже был заполнен!"
-                                         f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
-                                         parse_mode='Markdown')
+        await callback.message.edit_text(
+            f"👨🏻‍🔧 Дневной отчет за *{day} {months_selected[month]} {year}* уже был заполнен!"
+            f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
+            parse_mode='Markdown')
         try:
             await database_funcs.clear_reports(callback.from_user.id)
             os.remove(f"report_info/{callback.from_user.id}.txt")
@@ -106,7 +102,7 @@ async def select_day(callback: CallbackQuery, state: FSMContext):
             print(f"The file report_info/{callback.from_user.id}.txt was not found")
     else:
         await callback.message.edit_text(f"Проводились ли работы *{day} {months_selected[month]} {year}*?",
-                                     reply_markup=keyboards.yes_no_keyboard, parse_mode='Markdown')
+                                         reply_markup=keyboards.yes_no_keyboard, parse_mode='Markdown')
 
 
 @router.callback_query(F.data == "yes")
@@ -257,6 +253,7 @@ async def submit(callback: CallbackQuery):
     except FileNotFoundError:
         print(f"The file report_info/{callback.from_user.id}.txt was not found")
 
+
 @router.callback_query(F.data == "abort")
 async def abort(callback: CallbackQuery):
     await database_funcs.clear_reports(callback.from_user.id)
@@ -265,3 +262,69 @@ async def abort(callback: CallbackQuery):
     except FileNotFoundError:
         print(f"The file report_info/{callback.from_user.id}.txt was not found")
     await callback.message.edit_text("❌ Заполнение прервано, чтобы заполнить новый отчет, нажмите /start")
+
+
+@router.callback_query(or_f(F.data == "feedback", F.data == "feedback_no"))
+async def ask_for_feedback(callback: CallbackQuery, state: FSMContext):
+    msg = await callback.message.edit_text("Просто напишите Ваше сообщение и я передам его руководителю.")
+    await state.update_data(feedback_message=msg)
+    await state.set_state(States.wait_for_feedback)
+
+
+@router.callback_query(F.data == "feedback_yes")
+async def apply_feedback(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text("Передаю данные...")
+
+    try:
+        await fill_feedback.add_feedback(callback.from_user.id)
+        os.remove(f"feedbacks_temp/{callback.from_user.id}.txt")
+        await callback.message.edit_text(
+            "✅ Готово!\nЯ всё передал  🫡\n\nВаше сообщение будет рассмотрено в ближайшее время.\n\nПерейти в главное меню 👉  /start",
+            reply_markup=keyboards.feedback_keyboard)
+    except Exception as e:
+        await bot.send_message(403953652, f"❗️ОШИБКА ПРИ ИСПОЛНЕНИИ ОТ @{callback.from_user.username} (id = {callback.from_user.id})\n\n{e}")
+        await callback.message.edit_text("❗️ В ходе заполнения вышла ошибка", reply_markup=keyboards.feedback_keyboard)
+
+
+@router.message(States.wait_for_feedback)
+async def feedback(message: Message, state: FSMContext):
+    await message.delete()
+    state_data = await state.get_data()
+    msg = state_data.get('feedback_message')
+    await msg.edit_text(
+        f"Ваши предложения / идеи / пожелания:\n\n*{message.text}*\n\nЕсли хотите изменить текст, просто напишите сообщение еще раз, нажимать на кнопку не нужно)",
+        parse_mode='markdown', reply_markup=keyboards.yes_no_feedback_keyboard)
+    with open(f"feedbacks_temp/{message.from_user.id}.txt", 'w', encoding='utf-8') as file:
+        t = datetime.today() + timedelta(hours=3)
+
+        if len(str(t.day)) == 1:
+            day = f"0{t.day}"
+        else:
+            day = str(t.day)
+
+        if len(str(t.month)) == 1:
+            month = f"0{t.month}"
+        else:
+            month = str(t.month)
+
+        if len(str(t.hour)) == 1:
+            hour = f"0{t.hour}"
+        else:
+            hour = str(t.hour)
+
+        if len(str(t.minute)) == 1:
+            minute = f"0{t.minute}"
+        else:
+            minute = str(t.minute)
+
+        if message.from_user.username is None:
+            if message.from_user.first_name is not None:
+                username = f"{message.from_user.first_name}"
+                if message.from_user.last_name is not None:
+                    username += f" {message.from_user.last_name}"
+            else:
+                username = f"Нет данных"
+        else:
+            username = f"@{message.from_user.username}"
+
+        file.write(f'{day}.{month}.{t.year}|{hour}:{minute}|{username}|{message.text}')
