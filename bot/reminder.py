@@ -10,7 +10,7 @@ from bot import keyboards
 async def send_reminders(id):
     while True:
         keyboard = await keyboards.objects_to_keyboard(id)
-        if keyboard is None or len(keyboard.inline_keyboard) == 0:
+        if keyboard is None or len(keyboard.inline_keyboard) == 1:
             now = datetime.now()
             target_time = now.replace(hour=17, minute=0, second=0, microsecond=0)
             if now > target_time:
