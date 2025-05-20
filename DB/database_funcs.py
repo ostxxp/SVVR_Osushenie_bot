@@ -1,5 +1,6 @@
 from DB.database import session as db
 from DB.base_models import Prorab, Report
+from DB import objects_fetching
 
 # PRORABS
 async def prorab_exists(id):
@@ -26,6 +27,12 @@ async def set_objects(id, objects):
         db.close()
 
 async def get_unfilled_objects(id):
+    objs = await objects_fetching.fetch_objects_names(id)
+    unfilled_objs = db.query(Prorab).filter_by(id=id).first().objects_left
+    for obj in unfilled_objs[:-1].split('|'):
+        if obj not in objs:
+            unfilled_objs = unfilled_objs.replace(f"{obj}|", "")
+            db.commit()
     return db.query(Prorab).filter_by(id=id).first().objects_left[:-1].split('|')
 
 
