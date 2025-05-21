@@ -47,7 +47,7 @@ async def send_reminders(id):
                     # await bot.send_message(chat_id=id,
                     #                        text="‼️ Пожалуйста, заполните дневной отчет по объектам ‼️",
                     #                        reply_markup=await keyboards.objects_to_keyboard_by_names(id, unfilled_objects))
-                    print(unfilled_objects)
+                    print(len(unfilled_objects))
                     await asyncio.sleep(900)
                 else:
                     target_time = now.replace(hour=21, minute=0, second=0, microsecond=0)
