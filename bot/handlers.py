@@ -233,14 +233,30 @@ async def submit(callback: CallbackQuery):
         with open(f'report_info/{callback.from_user.id}.txt', 'a', encoding='utf-8') as file:
             file.write(f"{(await database_funcs.get_installers(callback.from_user.id))[:-1]}")
 
+    with open(f'report_info/{callback.from_user.id}.txt', 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+
+    if len(lines) > 1:
+        work_done = ""
+        for k in range(1, len(lines) - 1):
+            work_done += f"*{lines[k].split()[0].strip()}. {await groups_fetching.get_group_name(lines[k].split()[0].strip())}:* {lines[k].split()[1].strip()} {await groups_fetching.get_work_type(lines[k].split()[0].strip())}\n\n"
+        work_done += "\n*Монтажники:*\n" + "\n".join(sorted(lines[-1].split(',')))
+    else:
+        work_done = "❌ Работы не проводились"
+
     await report_table.create_table_report(callback.from_user.id)
+    object = await database_funcs.get_obj_name(callback.from_user.id)
     str_day = str(day)
     if len(str(day)) == 1:
         str_day = '0' + str_day
 
-    await callback.message.edit_text(f"✅ Дневной отчет за *{str_day} {months_selected[month]} {year}* заполнен!"
-                                     f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
-                                     parse_mode='Markdown')
+    await bot.send_message(chat_id="@osusheniebot",
+                           text=f"Отчет по объекту *{object}* от {await prorabs_fetching.get_prorab_name(callback.from_user.id)} за *{lines[0].strip()}*:\n\n{work_done}", parse_mode="Markdown")
+
+    await callback.message.edit_text(
+        f"✅Дневной отчет по объекту\n*{object}* за *{str_day} {months_selected[month]} {year}* заполнен!\n"
+        f"\nЧтобы заполнить ещё один отчет, напишите команду /start",
+        parse_mode='Markdown')
 
     if day == datetime.today().day and month == datetime.today().month and year == datetime.today().year:
         object_name = await database_funcs.get_obj_name(callback.from_user.id)
@@ -282,7 +298,8 @@ async def apply_feedback(callback: CallbackQuery, state: FSMContext):
             "✅ Готово!\nЯ всё передал  🫡\n\nВаше сообщение будет рассмотрено в ближайшее время.\n\nПерейти в главное меню 👉  /start",
             reply_markup=keyboards.feedback_keyboard)
     except Exception as e:
-        await bot.send_message(403953652, f"❗️ОШИБКА ПРИ ИСПОЛНЕНИИ ОТ @{callback.from_user.username} (id = {callback.from_user.id})\n\n{e}")
+        await bot.send_message(403953652,
+                               f"❗️ОШИБКА ПРИ ИСПОЛНЕНИИ ОТ @{callback.from_user.username} (id = {callback.from_user.id})\n\n{e}")
         await callback.message.edit_text("❗️ В ходе заполнения вышла ошибка", reply_markup=keyboards.feedback_keyboard)
 
 
