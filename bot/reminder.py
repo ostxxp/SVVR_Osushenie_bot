@@ -31,8 +31,8 @@ async def send_reminders(id):
             break
         now = datetime.now()
         hour = (now.hour + 3) % 24
-        if hour >= 20 or True:
-            if now.minute % 15 == 0 or True:
+        if hour >= 20:
+            if now.minute % 15 == 0:
                 if not await database_funcs.is_filled(id):
                     unfilled_objects = await database_funcs.get_unfilled_objects(id)
                     if len(unfilled_objects) == 0 or len(unfilled_objects) > 0 and unfilled_objects[0] == '':
