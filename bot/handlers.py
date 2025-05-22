@@ -250,7 +250,7 @@ async def submit(callback: CallbackQuery):
     if len(str(day)) == 1:
         str_day = '0' + str_day
 
-    await bot.send_message(chat_id="@osusheniebot",
+    await bot.send_message(chat_id="@otchety_itr_osushenie",
                            text=f"Отчет по объекту *{object}* от {await prorabs_fetching.get_prorab_name(callback.from_user.id)} за *{lines[0].strip()}*:\n\n{work_done}", parse_mode="Markdown")
 
     await callback.message.edit_text(
