@@ -242,7 +242,7 @@ async def submit(callback: CallbackQuery):
             work_done += f"*{lines[k].split()[0].strip()}. {await groups_fetching.get_group_name(lines[k].split()[0].strip())}:* {lines[k].split()[1].strip()} {await groups_fetching.get_work_type(lines[k].split()[0].strip())}\n\n"
         work_done += "\n*Монтажники:*\n" + "\n".join(sorted(lines[-1].split(',')))
     else:
-        work_done = "❌ Работы не проводились"
+        work_done = "❌ Монтажные работы не проводились"
 
     await report_table.create_table_report(callback.from_user.id)
     object = await database_funcs.get_obj_name(callback.from_user.id)

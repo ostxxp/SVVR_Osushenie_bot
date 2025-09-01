@@ -2,7 +2,7 @@ from DB.docs_fetching import client
 from DB.prorabs_fetching import get_prorabs
 
 spreadsheet = client.open_by_key('1OtnMFqU6-m-JsWyFX2GLG6HksRd18K0su4-INlcjN8A')
-worksheet = spreadsheet.sheet1
+worksheet = spreadsheet.get_worksheet(1)
 
 async def fetch_objects_names(id):
     all_values = worksheet.get_all_values()
