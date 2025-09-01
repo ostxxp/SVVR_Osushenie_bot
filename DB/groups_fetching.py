@@ -1,6 +1,6 @@
 from DB.docs_fetching import client
 
-spreadsheet = client.open_by_key("1r6ByCgCV2SmeqdBwAxi1nVMJ8XJVJMv_drFAPShBB_w")
+spreadsheet = client.open_by_key("1lpZoY8t4OZ7LrOl_5Bg_6zHziDsi84mvySVONN5le9E")
 
 worksheet = spreadsheet.sheet1
 all_values = worksheet.get_all_values()
